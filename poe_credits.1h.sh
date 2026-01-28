@@ -46,7 +46,4 @@ format_number() {
 formatted=$(format_number "$balance")
 
 # SwiftBar output
-echo "$formatted"
-echo "---"
-echo "Refresh | refresh=true"
-echo "View Usage | href=https://poe.com/billing/history"
+echo "Poe balance = $formatted"
