@@ -5,6 +5,12 @@
 #<xbar.desc>Display remaining Poe API credits</xbar.desc>
 #<xbar.dependencies>curl,bc</xbar.dependencies>
 
+# User variables
+# ================
+#<xbar.var>number(STARTING_DATE=0): Billing period starting date (1-31).</xbar.var>
+
+STARTING_DATE=21
+
 # Grabs API key (inspired by Dev/openai.30m.sh plugin)
 # Method 1: Environment variable (works in terminal)
 if [ -n "$POE_API_KEY" ]; then
@@ -73,5 +79,29 @@ format_number() {
 
 formatted="$(format_number "$balance")"
 
-# SwiftBar output (header)
-echo "Poe: $formatted"
+# if STARTING_DATE=0 or the variable was not defined, then the code displays only the 
+# remaining balance
+if [ -n "$STARTING_DATE" ] && [ $STARTING_DATE -gt 0 ]; then
+  # Validate STARTING_DATE (1-31)
+  if [ "$STARTING_DATE" -gt 31 ]; then
+    echo "⚠️ Invalid STARTING_DATE" >&2
+    exit 1
+  fi
+
+  # Compute DAYS passed since STARTING_DATE (exclusive)
+  TODAY=$(date +%d)
+  if [ "$STARTING_DATE" -le "$TODAY" ]; then
+    DAYS=$((TODAY - STARTING_DATE))
+  else
+    DAYS=$TODAY
+  fi
+
+  # Compute estimated spent: 1M credits/day * DAYS
+  DAILY_CREDITS=32895 # 1E6/30.4, assumes equal usage every day
+  ESTIMATED_SPENT=$((1000000-DAYS * DAILY_CREDITS))
+
+  # SwiftBar output (header)
+  echo "Poe: $formatted (Est.: $(format_number "$ESTIMATED_SPENT"))"
+else
+  echo "Poe: $formatted"
+fi
