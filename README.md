@@ -1,18 +1,16 @@
-# poe-credits
+# Check Poe API balance remaining
 
-A command-line tool to display remaining POE API credits.
+A command-line tool to display remaining POE API balance.
 
 ## Usage
 
-1. Set your POE API key:
-   ```bash
-   export POE_API_KEY="your_api_key_here"
-   ```
+(1) Set your POE API key:  
 
-2. Run the tool to display credits:
-   ```bash
-   poe-credits
-   ```
+    export POE_API_KEY="your_api_key_here"
+
+(2) Run the tool to display credits:
+
+    ./poe_balance.py
 
 3. Calculate days passed since a given day:
    ```bash

@@ -88,10 +88,12 @@ def main():
         sys.exit(1)
 
     print("Poe balance = ", end="")
-    print(format_number(balance), end=", ")
 
     # If --since argument is provided, calculate days since that day
-    if args.since is not None:
+    if args.since is None:
+        print(format_number(balance))
+    elif args.since is not None:
+        print(format_number(balance), end=", ")
         initial_balance=1e6
         dbalance=initial_balance/30.4 # expected credit usage per day
         days = days_since_day(args.since)
