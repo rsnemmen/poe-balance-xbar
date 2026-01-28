@@ -4,6 +4,7 @@ import os
 import sys
 import argparse
 from typing import Optional
+from datetime import date
 
 import requests
 
@@ -34,12 +35,48 @@ def get_balance(api_key: str) -> Optional[int]:
     return response.json()["current_point_balance"]
 
 
+def days_since_day(since_day: int) -> int:
+    """Calculate days passed since a given day of the month."""
+    today = date.today()
+    year = today.year
+    month = today.month
+    
+    # Get days in current month
+    import calendar
+    days_in_month = calendar.monthrange(year, month)[1]
+    
+    # If specified day is greater than days in month, use max valid day
+    actual_since_day = min(since_day, days_in_month)
+    
+    if today.day >= actual_since_day:
+        # We've passed the specified day in current month
+        return today.day - actual_since_day
+    else:
+        # We haven't passed the specified day yet
+        # Days from specified day to end of month + days from start of month to today
+        days_from_since_to_end = days_in_month - actual_since_day
+        days_from_start_to_today = today.day
+        return days_from_since_to_end + days_from_start_to_today
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="poe-credits",
         description="Display remaining POE API credits",
     )
-    parser.parse_args()
+    parser.add_argument(
+        "--since",
+        type=int,
+        choices=range(1, 32),
+        help="Calculate days passed since a given day of the month (1-31)"
+    )
+    args = parser.parse_args()
+
+    # If --since argument is provided, calculate days since that day
+    if args.since is not None:
+        days = days_since_day(args.since)
+        print(f"Days passed since day {args.since}: {days}")
+        return
 
     api_key = os.environ.get("POE_API_KEY")
     if not api_key:

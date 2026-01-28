@@ -9,9 +9,14 @@ A command-line tool to display remaining POE API credits.
    export POE_API_KEY="your_api_key_here"
    ```
 
-2. Run the tool:
+2. Run the tool to display credits:
    ```bash
    poe-credits
+   ```
+
+3. Calculate days passed since a given day:
+   ```bash
+   poe-credits --since 15
    ```
 
 ## Direct Script Usage
@@ -32,7 +37,7 @@ pip install requests
 Credits are displayed in human-readable format:
 
 | Range | Example |
-|-------|---------|
+|------|---------|
 | < 1,000 | `500` |
 | 1,000 - 999,999 | `150k` |
 | 1,000,000 - 999,999,999 | `1.5M` |
