@@ -2,12 +2,6 @@
 
 A command-line tool to display remaining POE API credits.
 
-## Installation
-
-```bash
-pip install -e .
-```
-
 ## Usage
 
 1. Set your POE API key:

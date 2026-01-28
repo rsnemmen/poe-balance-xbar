@@ -1,80 +1,62 @@
-# Agent Development Guidelines for poe-credits
+# AGENTS.md
 
-## Project Overview
-This is a Python command-line tool that displays remaining POE API credits. It uses the requests library for HTTP calls and supports command-line argument parsing.
+## Build, Lint, and Test Commands
 
-## Build Commands
-- `pip install -e .` - Install the package in development mode
-- `pip install -e .[dev]` - Install with development dependencies (if defined)
-- `python -m py_compile poe_credits.py` - Compile Python file to check syntax
+This project is a Python command-line tool that requires no build process. Linting is handled by ruff and mypy.
 
-## Lint Commands
-- `ruff check .` - Run Ruff code quality checks
-- `ruff format .` - Format code with Ruff
-- `mypy poe_credits.py` - Run mypy type checking
-- `flake8 poe_credits.py` - Run flake8 style checks
+### Linting
+- **Run linter**: `ruff check .`
+- **Auto-fix linting issues**: `ruff check --fix .`
+- **Run type checker**: `mypy .`
 
-## Test Commands
-- `python -m pytest` - Run all tests (if tests exist)
-- `python -m pytest tests/` - Run tests in tests directory (if exists)
-- `python -m pytest --tb=short` - Run tests with short tracebacks
-- `python -c "import poe_credits; print('Import successful')" ` - Validate import
-- For single test: `python -m pytest test_file.py::test_function_name` (if applicable)
-- `python poe_credits.py` - Direct script execution for basic testing
+### Testing
+- **Run all tests**: `python -m pytest` (if tests exist)
+- **Run specific test**: `python -m pytest tests/test_name.py::test_function_name`
+- **Run single test file**: `python -m pytest tests/test_file.py`
 
-## Python Code Style Guidelines
+### Code Style Guidelines
 
-### Imports
+#### Imports
 - Standard library imports first
 - Third-party imports second
 - Local imports third
 - Group imports with blank lines between each group
-- Use `from typing import Optional` style for type hints
-- Use absolute imports
 
-### Formatting
-- Use 4 spaces for indentation
-- Maximum line length: 88 characters
-- Use black-style formatting
-- One statement per line
-- Use f-strings for string formatting
-- Use docstrings for all functions (Google style)
+#### Formatting
+- Use 4 spaces for indentation (no tabs)
+- Maximum line length of 88 characters (PEP 8)
+- Use blank lines to separate functions and classes
+- Use docstrings for all functions and classes
 
-### Naming Conventions
-- Function names: snake_case
-- Class names: PascalCase
-- Constants: UPPER_CASE
-- Variables: snake_case
-- Private methods: _private_method (leading underscore)
-
-### Types
+#### Types
 - Use type hints for all function parameters and return values
-- Use Optional[T] for values that can be None
-- Use Union types for multiple possible types
-- Use List[T], Dict[T, U] for collections
+- Use Optional for parameters that can be None
+- Use Union for parameters that accept multiple types
+- Prefer built-in types like int, str, list, dict over typing module where appropriate
 
-### Error Handling
-- Use try/except blocks for network calls
-- Handle requests.exceptions.RequestException specifically
-- Return None or raise appropriate exceptions for invalid API responses
-- Use sys.exit(1) for fatal errors with error messages to stderr
-- Provide clear error messages for common failure scenarios
+#### Naming Conventions
+- Use `snake_case` for variables and functions
+- Use `PascalCase` for classes
+- Use `UPPER_CASE` for constants
+- Use descriptive names; avoid abbreviations unless widely understood
 
-### Documentation
-- Include docstrings for all functions (Google style)
+#### Error Handling
+- Prefer explicit exception handling over silent failures
+- Use `try/except/finally` blocks for error-prone code
+- Raise appropriate built-in exceptions (ValueError, TypeError, etc.)
+- Use `sys.exit(1)` with descriptive error messages to exit on critical errors
+
+#### Documentation
+- Include docstrings for all public functions and classes
+- Use `"""` for docstrings (not single quotes)
 - Document all parameters and return values
-- Include brief module description
-- Add usage examples in comments where appropriate
+- Include examples in docstrings when helpful
 
-## Cursor/Copilot Rules
-No specific Cursor or Copilot rules defined in this repository.
+#### Git Hooks
+- Pre-commit hook checks code formatting with ruff and type checking with mypy
+- Run `pre-commit install` to set up the hooks
 
-## Special Considerations
-- Uses requests library for HTTP calls
-- Requires POE_API_KEY environment variable
-- Handles API rate limits through HTTP status codes (401 for invalid key)
-- Supports human-readable number formatting for large values
-- Follows Unix-style command-line conventions with argparse
-
-## Test Structure
-The project is structured as a single module with no complex test directory structure. Tests can be added using pytest framework if desired.
+#### Environment
+- Project uses Python 3.8+
+- Dependencies managed with pip
+- `requests` library required for HTTP operations
