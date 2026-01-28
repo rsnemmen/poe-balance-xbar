@@ -72,12 +72,6 @@ def main():
     )
     args = parser.parse_args()
 
-    # If --since argument is provided, calculate days since that day
-    if args.since is not None:
-        days = days_since_day(args.since)
-        print(f"Days passed since day {args.since}: {days}")
-        return
-
     api_key = os.environ.get("POE_API_KEY")
     if not api_key:
         print("Error: POE_API_KEY environment variable not set", file=sys.stderr)
@@ -93,7 +87,17 @@ def main():
         print("Error: Invalid API key", file=sys.stderr)
         sys.exit(1)
 
-    print(format_number(balance))
+    print("Poe balance = ", end="")
+    print(format_number(balance), end=", ")
+
+    # If --since argument is provided, calculate days since that day
+    if args.since is not None:
+        initial_balance=1e6
+        dbalance=initial_balance/30.4 # expected credit usage per day
+        days = days_since_day(args.since)
+        #print(f"Days passed since day {args.since}: {days}", end=" ")
+        balance_expected=initial_balance-days*dbalance
+        print("expected = "+format_number(balance_expected))
 
 
 if __name__ == "__main__":
