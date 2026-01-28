@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #<swiftbar.environment>[API_KEY=]</swiftbar.environment>
-#<xbar.title>POE Credits</xbar.title>
+#<xbar.title>Poe Balance</xbar.title>
 #<xbar.version>1.0</xbar.version>
-#<xbar.author>User</xbar.author>
-#<xbar.desc>Display remaining POE API credits</xbar.desc>
+#<xbar.author>Rodrigo Nemmen da Silva</xbar.author>
+#<xbar.desc>Display remaining Poe API credits</xbar.desc>
 #<xbar.dependencies>curl,bc</xbar.dependencies>
 
 # Prefer SwiftBar-provided API_KEY; fallback to POE_API_KEY from environment
@@ -11,7 +11,7 @@ API_KEY="${API_KEY:-${POE_API_KEY:-}}"
 
 if [ -z "$API_KEY" ]; then
   echo "⚠️ No API Key"
-  echo "Missing API key. Set API_KEY via <swiftbar.environment> or export POE_API_KEY." >&2
+  echo "Missing API key. Set API_KEY via <swiftbar.environment> or export POE_API_KEY if running in terminal." >&2
   exit 1
 fi
 
@@ -59,4 +59,4 @@ format_number() {
 formatted="$(format_number "$balance")"
 
 # SwiftBar output (header)
-echo "Poe balance = $formatted"
+echo "Poe: $formatted"
