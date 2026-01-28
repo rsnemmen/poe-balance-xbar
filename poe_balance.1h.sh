@@ -26,7 +26,7 @@ API_KEY="${API_KEY:-${POE_API_KEY:-}}"
 
 if [ -z "$API_KEY" ]; then
   echo "⚠️ No API Key"
-  echo "Missing API key. Set API_KEY via <swiftbar.environment> or export POE_API_KEY if running in terminal." >&2
+  echo "Missing API key. Set API_KEY via export POE_API_KEY in .bashrc or .zshrc." >&2
   exit 1
 fi
 
