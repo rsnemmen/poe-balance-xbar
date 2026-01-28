@@ -1,10 +1,25 @@
 #!/usr/bin/env bash
-#<swiftbar.environment>[API_KEY=]</swiftbar.environment>
 #<xbar.title>Poe Balance</xbar.title>
 #<xbar.version>1.0</xbar.version>
 #<xbar.author>Rodrigo Nemmen da Silva</xbar.author>
 #<xbar.desc>Display remaining Poe API credits</xbar.desc>
 #<xbar.dependencies>curl,bc</xbar.dependencies>
+
+# Grabs API key (inspired by Dev/openai.30m.sh plugin)
+# Method 1: Environment variable (works in terminal)
+if [ -n "$POE_API_KEY" ]; then
+    API_KEY="$POE_API_KEY"
+fi
+
+# Method 2: from Z shell config file (works for GUI apps like SwiftBar)
+if [ -z "$API_KEY" ] && [ -f "$HOME/.zshrc" ]; then
+    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.zshrc" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+fi
+
+# Method 3: from bash config file 
+if [ -z "$API_KEY" ] && [ -f "$HOME/.bashrc" ]; then
+    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.bashrc" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+fi
 
 # Prefer SwiftBar-provided API_KEY; fallback to POE_API_KEY from environment
 API_KEY="${API_KEY:-${POE_API_KEY:-}}"
