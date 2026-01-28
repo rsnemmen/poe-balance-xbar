@@ -12,31 +12,35 @@ A command-line tool to display remaining POE API balance.
 
     ./poe_balance.py
 
-3. Calculate days passed since a given day:
-   ```bash
-   poe-credits --since 15
-   ```
+(3) Shows expected balance assuming uniform usage (specify the starting day of your Poe account as an argument, here for example on the 15th):
 
-## Direct Script Usage
+	./poe_balance --since 15
 
-You can also run the script directly:
+### Direct Script Usage
+
+You can also run the script specifying the API key directly in the command-line:
 
 ```bash
 POE_API_KEY="your_api_key_here" python3 poe_balance.py
 ```
 
-**Note:** When running directly, you need `requests` installed in your Python environment:
+**Note:** Please make sure `requests` is installed in your Python environment:
+
 ```bash
 pip install requests
 ```
 
 ## SwiftBar Integration
 
-This tool also works with SwiftBar (https://github.com/swiftbar/SwiftBar):
+This tool also works with [SwiftBar](https://github.com/swiftbar/SwiftBar):
 
 1. Install SwiftBar
 2. Place `poe_balance.1h.sh` in your SwiftBar plugins folder
-3. Optionally, set your API key via SwiftBar's environment variable panel or export `POE_API_KEY` in your shell
+3. Optionally, set your API key via SwiftBar's environment variable panel or in `.bashrc` or `.zshrc` (depending on your shell) with 
+
+```shell
+export POE_API_KEY="your-API-key-here"
+```
 
 ## Output
 
