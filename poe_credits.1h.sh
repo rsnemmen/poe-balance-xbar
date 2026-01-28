@@ -1,49 +1,62 @@
 #!/usr/bin/env bash
+#<swiftbar.environment>[API_KEY=]</swiftbar.environment>
 #<xbar.title>POE Credits</xbar.title>
 #<xbar.version>1.0</xbar.version>
 #<xbar.author>User</xbar.author>
 #<xbar.desc>Display remaining POE API credits</xbar.desc>
 #<xbar.dependencies>curl,bc</xbar.dependencies>
 
-# Get API key
-API_KEY="${POE_API_KEY}"
+# Prefer SwiftBar-provided API_KEY; fallback to POE_API_KEY from environment
+API_KEY="${API_KEY:-${POE_API_KEY:-}}"
+
 if [ -z "$API_KEY" ]; then
-    echo "⚠️ No API Key" >&2
-    exit 1
+  echo "⚠️ No API Key"
+  echo "Missing API key. Set API_KEY via <swiftbar.environment> or export POE_API_KEY." >&2
+  exit 1
 fi
 
 # Fetch balance
-response=$(curl -s -w "\n%{http_code}" \
-    -H "Authorization: Bearer $API_KEY" \
-    -H "Accept: application/json" \
-    "https://api.poe.com/usage/current_balance")
+response="$(curl -s -w "\n%{http_code}" \
+  -H "Authorization: Bearer ${API_KEY}" \
+  -H "Accept: application/json" \
+  "https://api.poe.com/usage/current_balance")"
 
-http_code=$(echo "$response" | tail -1)
-body=$(echo "$response" | sed '$d')
+http_code="$(printf '%s\n' "$response" | tail -n 1)"
+body="$(printf '%s\n' "$response" | sed '$d')"
 
 if [ "$http_code" = "401" ]; then
-    echo "⚠️ Invalid Key"
-    exit 1
+  echo "⚠️ Invalid Key"
+  exit 1
+elif [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+  echo "⚠️ POE API Error ($http_code)"
+  echo "Response body: $body" >&2
+  exit 1
 fi
 
-# Extract balance from JSON
-balance=$(echo "$body" | sed 's/.*"current_point_balance": \([0-9]*\).*/\1/')
+# Extract balance from JSON (kept simple; assumes integer field)
+balance="$(printf '%s\n' "$body" | sed -n 's/.*"current_point_balance"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p')"
+
+if [ -z "$balance" ]; then
+  echo "⚠️ Parse Error"
+  echo "Could not parse current_point_balance from: $body" >&2
+  exit 1
+fi
 
 # Format number (e.g., 693000 -> 693k)
 format_number() {
-    n=$1
-    if [ "$n" -lt 1000 ]; then
-        echo "$n"
-    elif [ "$n" -lt 1000000 ]; then
-        echo "$((n / 1000))k"
-    elif [ "$n" -lt 1000000000 ]; then
-        echo "$(echo "scale=1; $n / 1000000" | bc | sed 's/\.0$//')M"
-    else
-        echo "$(echo "scale=1; $n / 1000000000" | bc | sed 's/\.0$//')B"
-    fi
+  local n="$1"
+  if [ "$n" -lt 1000 ]; then
+    echo "$n"
+  elif [ "$n" -lt 1000000 ]; then
+    echo "$((n / 1000))k"
+  elif [ "$n" -lt 1000000000 ]; then
+    echo "$(echo "scale=1; $n / 1000000" | bc | sed 's/\.0$//')M"
+  else
+    echo "$(echo "scale=1; $n / 1000000000" | bc | sed 's/\.0$//')B"
+  fi
 }
 
-formatted=$(format_number "$balance")
+formatted="$(format_number "$balance")"
 
-# SwiftBar output
+# SwiftBar output (header)
 echo "Poe balance = $formatted"
