@@ -20,6 +20,19 @@ pip install -e .
    poe-credits
    ```
 
+## Direct Script Usage
+
+You can also run the script directly:
+
+```bash
+POE_API_KEY="your_api_key_here" python3 poe_credits.py
+```
+
+**Note:** When running directly, you need `requests` installed in your Python environment:
+```bash
+pip install requests
+```
+
 ## Output
 
 Credits are displayed in human-readable format:
