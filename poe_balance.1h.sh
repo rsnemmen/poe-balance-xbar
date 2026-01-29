@@ -15,7 +15,9 @@ STARTING_DATE=$VAR_STARTING_DATE
 PERCENT=$VAR_PERCENT
 INITIAL_BALANCE=1000000
 
-# Grabs API key (inspired by Dev/openai.30m.sh plugin)
+# === Grabs API key === 
+# (inspired by Dev/openai.30m.sh plugin)
+
 # Method 1: Environment variable (works in terminal)
 if [ -n "$POE_API_KEY" ]; then
     API_KEY="$POE_API_KEY"
@@ -40,7 +42,7 @@ if [ -z "$API_KEY" ]; then
   exit 1
 fi
 
-# Fetch balance
+# === Fetch balance ===
 response="$(curl -s -w "\n%{http_code}" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Accept: application/json" \
@@ -67,7 +69,8 @@ if [ -z "$balance" ]; then
   exit 1
 fi
 
-# Format number (e.g., 693000 -> 693k)
+# === Format number ===
+# (e.g., 693000 -> 693k)
 format_number() {
   local n="$1"
   if [ "$n" -lt 1000 ]; then
@@ -101,7 +104,8 @@ if [ "$PERCENT" = "true" ]; then
       exit 1
     fi
 
-    # Compute DAYS passed since STARTING_DATE (exclusive)
+    # === Compute DAYS passed since STARTING_DATE ===
+    # (exclusive)
     TODAY=$(date +%d)
     if [ "$STARTING_DATE" -le "$TODAY" ]; then
       DAYS=$((TODAY - STARTING_DATE))
@@ -141,7 +145,7 @@ else
     DAILY_CREDITS=32895 # 1E6/30.4, assumes equal usage every day
     ESTIMATED_SPENT=$((INITIAL_BALANCE-DAYS * DAILY_CREDITS))
 
-    # SwiftBar output (header)
+    # === SwiftBar output ===
     echo "Poe: $formatted (Est.: $(format_number "$ESTIMATED_SPENT"))"
   else
     echo "Poe: $formatted"
