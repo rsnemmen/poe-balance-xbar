@@ -8,7 +8,7 @@ To use this tool, define your Poe API key by adding the following line to your `
 
     export POE_API_KEY="your-API-key-here"
 
-You can find your API key by visiting poe.com/api_key.
+You can find your API key by [going here](https://poe.com/api_key).
 
 ## SwiftBar / xbar Integration
 
@@ -17,7 +17,7 @@ This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plu
 `Poe: 670k` ← actual credits remaining  
 `Poe: 67%` ← percentage remaining  
 
-`Poe: 670k (Est.: 720k)` ← (a) actual credits remaining and (b) expected credits today assuming the user consumes the same amount of credits everyday throughout the month. “Est.” can be useful to judge if you are overspending your credits.  
+`Poe: 670k (Est.: 720k)` ← (a) actual credits remaining and (b) expected credits today assuming the user consumes the same amount of credits everyday throughout the month. Example: if your credit starts at 1E6 units and 1 day has passed, you are expected 967k credits remaining for typical usage. “Est.” can be useful to judge if you are overspending your credits.  
 `Poe: 67% (Est.: 72%)` ← same as above in percentage
 
 ### Installing and configuring the SwiftBar plugin
