@@ -7,9 +7,13 @@
 
 # User variables
 # ================
-#<xbar.var>number(VAR_STARTING_DATE="0"): Billing period starting date (1-31).</xbar.var>
+# Reference: https://xbarapp.com/docs/2021/03/14/variables-in-xbar.html
+#<xbar.var>number(VAR_STARTING_DATE="0"): Billing period starting date (1-31). Set to 0 to disable.</xbar.var>
+#<xbar.var>boolean(VAR_PERCENT="true"): Display remaining balance as percentage?.</xbar.var>
 
 STARTING_DATE=$VAR_STARTING_DATE
+PERCENT=$VAR_PERCENT
+INITIAL_BALANCE=1000000
 
 # Grabs API key (inspired by Dev/openai.30m.sh plugin)
 # Method 1: Environment variable (works in terminal)
@@ -77,31 +81,69 @@ format_number() {
   fi
 }
 
+# Round number to integer
+round() {
+  printf "%.0f" "$(echo "scale=10; $1" | bc)"
+}
+
 formatted="$(format_number "$balance")"
 
 # if STARTING_DATE=0 or the variable was not defined, then the code displays only the 
 # remaining balance
-if [ -n "$STARTING_DATE" ] && [ $STARTING_DATE -gt 0 ]; then
-  # Validate STARTING_DATE (1-31)
-  if [ "$STARTING_DATE" -gt 31 ]; then
-    echo "⚠️ Invalid STARTING_DATE" >&2
-    exit 1
-  fi
+if [ "$PERCENT" = "true" ]; then
+  # Calculate percentage
+  pct=$(round "$balance / 10000")
+  
+  if [ -n "$STARTING_DATE" ] && [ $STARTING_DATE -gt 0 ]; then
+    # Validate STARTING_DATE (1-31)
+    if [ "$STARTING_DATE" -gt 31 ]; then
+      echo "⚠️ Invalid STARTING_DATE" >&2
+      exit 1
+    fi
 
-  # Compute DAYS passed since STARTING_DATE (exclusive)
-  TODAY=$(date +%d)
-  if [ "$STARTING_DATE" -le "$TODAY" ]; then
-    DAYS=$((TODAY - STARTING_DATE))
+    # Compute DAYS passed since STARTING_DATE (exclusive)
+    TODAY=$(date +%d)
+    if [ "$STARTING_DATE" -le "$TODAY" ]; then
+      DAYS=$((TODAY - STARTING_DATE))
+    else
+      DAYS=$TODAY
+    fi
+
+    # Compute estimated spent: 1M credits/day * DAYS
+    DAILY_CREDITS=32895 # 1E6/30.4, assumes equal usage every day
+    ESTIMATED_SPENT=$((INITIAL_BALANCE-DAYS * DAILY_CREDITS))
+    
+    # Calculate estimated percentage
+    est_pct=$(round "$ESTIMATED_SPENT / 10000")
+    
+    # SwiftBar output (header)
+    echo "Poe: ${pct}% (Est.: ${est_pct}%)"
   else
-    DAYS=$TODAY
+    echo "Poe: ${pct}%"
   fi
-
-  # Compute estimated spent: 1M credits/day * DAYS
-  DAILY_CREDITS=32895 # 1E6/30.4, assumes equal usage every day
-  ESTIMATED_SPENT=$((1000000-DAYS * DAILY_CREDITS))
-
-  # SwiftBar output (header)
-  echo "Poe: $formatted (Est.: $(format_number "$ESTIMATED_SPENT"))"
 else
-  echo "Poe: $formatted"
+  if [ -n "$STARTING_DATE" ] && [ $STARTING_DATE -gt 0 ]; then
+    # Validate STARTING_DATE (1-31)
+    if [ "$STARTING_DATE" -gt 31 ]; then
+      echo "⚠️ Invalid STARTING_DATE" >&2
+      exit 1
+    fi
+
+    # Compute DAYS passed since STARTING_DATE (exclusive)
+    TODAY=$(date +%d)
+    if [ "$STARTING_DATE" -le "$TODAY" ]; then
+      DAYS=$((TODAY - STARTING_DATE))
+    else
+      DAYS=$TODAY
+    fi
+
+    # Compute estimated spent: 1M credits/day * DAYS
+    DAILY_CREDITS=32895 # 1E6/30.4, assumes equal usage every day
+    ESTIMATED_SPENT=$((INITIAL_BALANCE-DAYS * DAILY_CREDITS))
+
+    # SwiftBar output (header)
+    echo "Poe: $formatted (Est.: $(format_number "$ESTIMATED_SPENT"))"
+  else
+    echo "Poe: $formatted"
+  fi
 fi
