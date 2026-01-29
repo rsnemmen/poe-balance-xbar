@@ -7,7 +7,8 @@
 
 # User variables
 # ================
-# Reference: https://xbarapp.com/docs/2021/03/14/variables-in-xbar.html
+# For detailed instructions, visit https://github.com/rsnemmen/poe-balance
+#
 #<xbar.var>number(VAR_STARTING_DATE="0"): Billing period starting date (1-31). Set to 0 to disable.</xbar.var>
 #<xbar.var>boolean(VAR_PERCENT="true"): Display remaining balance as percentage?.</xbar.var>
 
