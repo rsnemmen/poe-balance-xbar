@@ -105,18 +105,25 @@ if [ "$PERCENT" = "true" ]; then
     fi
 
     # === Compute DAYS passed since STARTING_DATE ===
-    # (exclusive)
-    TODAY=$(date +%d)
+    # Compute DAYS passed since STARTING_DATE as a fractional number
+    TODAY=$((10#$(date +%d)))   # force base-10 (avoids issues with leading zeros)
+    NOW_S=$(date +%s)
+
     if [ "$STARTING_DATE" -le "$TODAY" ]; then
-      DAYS=$((TODAY - STARTING_DATE))
+      # start date is in the current month at 00:00:00
+      START_S=$(date -j -v"${STARTING_DATE}"d -v0H -v0M -v0S +%s)
     else
-      DAYS=$TODAY
+      # start date is in the previous month at 00:00:00
+      START_S=$(date -j -v-1m -v"${STARTING_DATE}"d -v0H -v0M -v0S +%s)
     fi
+
+    DAYS=$(echo "scale=4; ($NOW_S - $START_S) / 86400" | bc)  # e.g. 4.3333
+    echo $DAYS
 
     # Compute estimated spent: 1M credits/day * DAYS
     DAILY_CREDITS=32895 # 1E6/30.4, assumes equal usage every day
-    ESTIMATED_SPENT=$((INITIAL_BALANCE-DAYS * DAILY_CREDITS))
-    
+    ESTIMATED_SPENT=$(round "$INITIAL_BALANCE - ($DAYS * $DAILY_CREDITS)")
+
     # Calculate estimated percentage
     est_pct=$(round "$ESTIMATED_SPENT / 10000")
     
