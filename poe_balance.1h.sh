@@ -118,7 +118,6 @@ if [ "$PERCENT" = "true" ]; then
     fi
 
     DAYS=$(echo "scale=4; ($NOW_S - $START_S) / 86400" | bc)  # e.g. 4.3333
-    echo $DAYS
 
     # Compute estimated spent: 1M credits/day * DAYS
     DAILY_CREDITS=32895 # 1E6/30.4, assumes equal usage every day
