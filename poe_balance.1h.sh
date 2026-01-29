@@ -9,6 +9,7 @@
 # ================
 #<xbar.var>number(STARTING_DATE=0): Billing period starting date (1-31).</xbar.var>
 
+# Because I can't figure out how to make SwiftBar use the variable above...
 STARTING_DATE=21
 
 # Grabs API key (inspired by Dev/openai.30m.sh plugin)
