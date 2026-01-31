@@ -14,10 +14,15 @@ You can find your API key by [going here](https://poe.com/api_key).
 
 This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plugin to display your remaining Poe balance in the MacOS menu bar. It can display the balance in one of the following ways:
 
+![Balance remaining](images/credits.png)  
 `Poe: 670k` ← actual credits remaining  
+
+![Percentage remaining](images/percent.png)  
 `Poe: 67%` ← percentage remaining  
 
 `Poe: 670k (Est.: 720k)` ← (a) actual credits remaining and (b) expected credits today assuming the user consumes the same amount of credits everyday throughout the month. Example: if your credit starts at 1E6 units and 1 day has passed, you are expected 967k credits remaining for typical usage. “Est.” can be useful to judge if you are overspending your credits.  
+
+![More details](images/percent_est.png)  
 `Poe: 67% (Est.: 72%)` ← same as above in percentage
 
 ### Installing and configuring the SwiftBar plugin
