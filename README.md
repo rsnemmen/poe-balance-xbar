@@ -1,6 +1,6 @@
-# Check Poe API balance remaining
+# Check Poe API balance remaining in the menu bar
 
-A command-line tool and SwiftBar/xbar plugin to display remaining Poe API balance. Works in the terminal or in the MacOS menu bar.
+A SwiftBar/xbar plugin and command-line tool to display your remaining Poe API balance. Works in the MacOS menu bar or terminal.
 
 ## Find the API key
 
