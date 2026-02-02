@@ -3,6 +3,7 @@
 #<xbar.version>1.0</xbar.version>
 #<xbar.author>Rodrigo Nemmen da Silva</xbar.author>
 #<xbar.desc>Display remaining Poe API credits</xbar.desc>
+#<xbar.image>http://www.hosted-somewhere/pluginimage</xbar.image>
 #<xbar.dependencies>curl,bc</xbar.dependencies>
 
 # User variables
