@@ -16,6 +16,8 @@ STARTING_DATE=$VAR_STARTING_DATE
 PERCENT=$VAR_PERCENT
 INITIAL_BALANCE=1000000
 
+POE_ICON="iVBORw0KGgoAAAANSUhEUgAAADIAAAAqCAYAAADxughHAAAACXBIWXMAAC4jAAAuIwF4pT92AAADEUlEQVRogdWZ25WbMBCGv8nJe+gglEAqWEpwByEdOB1QgktwKohTQdgOSAVhO2ArmDwwPshYEkbGl8w5erA0I82vuSKLqhIjEdkCmyjTenRQ1V2SpKoGB7AF9M5jG9MpqOsMkPYBQNoUIBJzLRGJ+92NSFVlqcyH0IKI5Ncocw2lnB0EAqQF3Tq0+Owz1xKRzDb6alM/gAbortNtlnKgnJy7VdX+ImkDsgEODAr3jIFXpQTeNQOonPN706kG8hk5avzZo743CEepkE6bYNYyBh99UdU2ZEkRKYAM6GN8KTIW7H89S39UtQjJefP5zI01E/79Bbe8n8g0M/yhOlOEXGsREMLVPmh2hhhcVMUjQErfWbH0G6IyMB80eWQttNccFSJykqJTgGSJh6+9V2WlAkgD8iz0Cacr/5+BAOQiUotI9jFBuAVePPOxChxauyhtz1AJZCkW2QHvk7l3hvQaon1AZq1+bhPrfr2BqKodwy38Al4ZeqJCIz2RrRXG+2qype118dlGPpnPcF7cHtZnOTWkCujU2PrOfteO/mQBMB2QPQBEZmefgTjq4+g7AplsUthtHDvg1lzgXiBKxs/r3nTJPTrqFIj3U9d8tD36ntGrxzfXpIKhNgC84cSdNZHHsXP4vjGAfYndTqg/usfYOLffRPhyfK61oHG76XBipY/wVSfx8oRA+klmcoN9yxBH+Vm8PCGQ/SQzKU67b8qXBnS02JMBaRlTbGdzBwdAF5A7pPRaAN9Zp086IVVtAESkZMyYe8taDWO2OtIbw6NJnWKR+sa1ZMNpkJecfiZ7a9tSIAdn7RAAeovAbxwQ3m5jCZCO0X/rO4BQxhR7tFCwy7j0EfvdNmlFZAP8dNj+mHXWpkZVG4uX3wAae9yesUiF9TxO5nD9t+NGjSVDQayc87oo/8KN3f9LeuyNiXgbsdbYrQVkP9n4aKVpBb7F2M9ZPhXIznG9Mws9YiwBUjEE9TYQL9WjQCwC4omX7lL/fWYgbjFsHg1CNe3t16U37vcffJSiBTEoNBSpnMEa3boqpdE/EDqlk/DR3JgAAAAASUVORK5CYII="
+
 # === Grabs API key === 
 # (inspired by Dev/openai.30m.sh plugin)
 
@@ -128,9 +130,9 @@ if [ "$PERCENT" = "true" ]; then
     est_pct=$(round "$ESTIMATED_SPENT / 10000")
     
     # SwiftBar output (header)
-    echo "Poe: ${pct}% (Est.: ${est_pct}%)"
+    echo "${pct}% (Est.: ${est_pct}%) | image=$POE_ICON"
   else
-    echo "Poe: ${pct}%"
+    echo "${pct}% | image=$POE_ICON"
   fi
 else
   if [ -n "$STARTING_DATE" ] && [ $STARTING_DATE -gt 0 ]; then
@@ -153,8 +155,8 @@ else
     ESTIMATED_SPENT=$((INITIAL_BALANCE-DAYS * DAILY_CREDITS))
 
     # === SwiftBar output ===
-    echo "Poe: $formatted (Est.: $(format_number "$ESTIMATED_SPENT"))"
+    echo "$formatted (Est.: $(format_number "$ESTIMATED_SPENT")) | image=$POE_ICON"
   else
-    echo "Poe: $formatted"
+    echo "$formatted | image=$POE_ICON"
   fi
 fi
