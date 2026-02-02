@@ -3,7 +3,7 @@
 #<xbar.version>1.0</xbar.version>
 #<xbar.author>Rodrigo Nemmen da Silva</xbar.author>
 #<xbar.desc>Display remaining Poe API credits</xbar.desc>
-#<xbar.image>http://www.hosted-somewhere/pluginimage</xbar.image>
+#<xbar.image>https://github.com/rsnemmen/poe-balance/blob/780b20c79f3433f1908353888a6fa59217f3b8f9/images/cover.png</xbar.image>
 #<xbar.dependencies>curl,bc</xbar.dependencies>
 
 # User variables
