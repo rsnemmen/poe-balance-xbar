@@ -25,16 +25,6 @@ This project is a Python command-line tool. No build process required.
 - Third-party imports second (requests)
 - Local imports third
 - Group imports with blank lines between each group
-- Example:
-  ```python
-  import os
-  import sys
-  import argparse
-  from typing import Optional
-  from datetime import date
-
-  import requests
-  ```
 
 ### Formatting
 - Use 4 spaces for indentation (no tabs)
@@ -67,14 +57,6 @@ This project is a Python command-line tool. No build process required.
 - Use `try/except/finally` blocks for error-prone code (especially network operations)
 - Raise appropriate built-in exceptions (ValueError, TypeError, etc.)
 - Use `sys.exit(1)` with descriptive error messages for CLI errors
-- Example:
-  ```python
-  try:
-      balance = get_balance(api_key)
-  except requests.exceptions.RequestException as e:
-      print(f"Error: {e}", file=sys.stderr)
-      sys.exit(1)
-  ```
 
 ### Documentation
 - Include docstrings for all public functions and classes
@@ -82,12 +64,6 @@ This project is a Python command-line tool. No build process required.
 - Document all parameters and return values
 - Include examples in docstrings when helpful
 - Keep docstrings concise but informative
-- Example:
-  ```python
-  def days_since_day(since_day: int) -> int:
-      """Calculate days passed since a given day of the month."""
-      ...
-  ```
 
 ### Code Structure
 - Keep functions focused and single-purpose
@@ -119,3 +95,58 @@ POE_API_KEY="your_key" python3 poe_balance.py
 # With --since argument
 ./poe_balance.py --since 15
 ```
+
+## Shell Script Guidelines (for `poe_balance.1h.sh`)
+
+### Bash Style
+- Use `#!/usr/bin/env bash` shebang
+- Use 2 spaces for indentation in shell scripts
+- Quote all variables: `"$VAR"` not `$VAR`
+- Use `[[ ]]` for conditionals instead of `[ ]` when available
+- Use `$(command)` instead of backticks for command substitution
+
+### Error Handling in Shell
+- Use `set -euo pipefail` at the top of scripts when appropriate
+- Always check exit codes from critical commands
+- Redirect errors to stderr: `echo "Error" >&2`
+- Use `exit 1` for error conditions
+
+### SwiftBar/xbar Plugin Format
+- Include metadata comments at the top:
+  ```bash
+  #<xbar.title>Plugin Name</xbar.title>
+  #<xbar.version>1.0</xbar.version>
+  ```
+- Use `templateImage=` for icons that adapt to dark/light mode
+- Use `image=` for fixed-color icons
+
+## Dependency Management
+
+### Python Dependencies
+- No formal requirements.txt - install manually: `pip install requests`
+- Keep dependencies minimal (only `requests` currently required)
+
+### Shell Script Dependencies
+- Document dependencies in `<xbar.dependencies>` comment
+- Currently requires: `curl`, `bc`
+
+## Git Workflow
+
+### Pre-Commit Setup
+```bash
+# Install pre-commit hooks
+pre-commit install
+```
+
+### Commit Guidelines
+- Use present tense ("Add feature" not "Added feature")
+- Use imperative mood ("Move cursor to..." not "Moves cursor to...")
+- Limit first line to 72 characters
+- Reference issues and pull requests liberally after first line
+
+### Testing Best Practices
+- Create test files in `tests/` directory: `test_<module>.py`
+- Name test functions: `test_<function_name>`
+- Use pytest fixtures for common setup
+- Mock external API calls in tests
+- Tests should not require real API keys
