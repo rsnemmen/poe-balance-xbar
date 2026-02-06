@@ -32,7 +32,12 @@ if [ -z "$API_KEY" ] && [ -f "$HOME/.zshrc" ]; then
     API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.zshrc" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
 fi
 
-# Method 3: from bash config file 
+# Method 3: from Z shell env file (sourced by all zsh shells)
+if [ -z "$API_KEY" ] && [ -f "$HOME/.zshenv" ]; then
+    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.zshenv" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+fi
+
+# Method 4: from bash config file 
 if [ -z "$API_KEY" ] && [ -f "$HOME/.bashrc" ]; then
     API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.bashrc" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
 fi
