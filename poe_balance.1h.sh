@@ -107,7 +107,16 @@ formatted="$(format_number "$balance")"
 if [ "$PERCENT" = "true" ]; then
   # Calculate percentage
   pct=$(round "$balance / 10000")
-  
+
+  # Determine color based on percentage
+  if [ "$pct" -lt 10 ]; then
+    COLOR="#FF0000"
+  elif [ "$pct" -lt 20 ]; then
+    COLOR="#FFD700"
+  else
+    COLOR=""
+  fi
+
   if [ -n "$STARTING_DATE" ] && [ $STARTING_DATE -gt 0 ]; then
     # Validate STARTING_DATE (1-31)
     if [ "$STARTING_DATE" -gt 31 ]; then
@@ -139,14 +148,26 @@ if [ "$PERCENT" = "true" ]; then
     
     # SwiftBar output (header)
     if [ "$COMPACT" = "true" ]; then
-      echo "${pct}%/${est_pct}% | templateImage=$POE_ICON"
+      echo "${pct}%/${est_pct}% | templateImage=$POE_ICON color=${COLOR}"
     else
-      echo "${pct}% (Est.: ${est_pct}%) | templateImage=$POE_ICON"
+      echo "${pct}% (Est.: ${est_pct}%) | templateImage=$POE_ICON color=${COLOR}"
     fi
   else
-    echo "${pct}% | templateImage=$POE_ICON"
+    echo "${pct}% | templateImage=$POE_ICON color=${COLOR}"
   fi
 else
+  # Calculate percentage for color determination
+  pct=$(round "$balance / 10000")
+
+  # Determine color based on percentage
+  if [ "$pct" -lt 10 ]; then
+    COLOR="#FF0000"
+  elif [ "$pct" -lt 20 ]; then
+    COLOR="#FFD700"
+  else
+    COLOR=""
+  fi
+
   if [ -n "$STARTING_DATE" ] && [ $STARTING_DATE -gt 0 ]; then
     # Validate STARTING_DATE (1-31)
     if [ "$STARTING_DATE" -gt 31 ]; then
@@ -168,11 +189,11 @@ else
 
     # === SwiftBar output ===
     if [ "$COMPACT" = "true" ]; then
-      echo "$formatted/$(format_number "$ESTIMATED_SPENT") | templateImage=$POE_ICON"
+      echo "$formatted/$(format_number "$ESTIMATED_SPENT") | templateImage=$POE_ICON color=${COLOR}"
     else
-      echo "$formatted (Est.: $(format_number "$ESTIMATED_SPENT")) | templateImage=$POE_ICON"
+      echo "$formatted (Est.: $(format_number "$ESTIMATED_SPENT")) | templateImage=$POE_ICON color=${COLOR}"
     fi
   else
-    echo "$formatted | templateImage=$POE_ICON"
+    echo "$formatted | templateImage=$POE_ICON color=${COLOR}"
   fi
 fi
