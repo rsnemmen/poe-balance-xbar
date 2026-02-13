@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Project Overview
+
+This is a Python CLI tool and SwiftBar/xbar plugin to display remaining Poe API credits. The tool queries the Poe API to get the current point balance and optionally calculates expected credits based on average usage.
+
 ## Build, Lint, and Test Commands
 
 This project is a Python command-line tool. No build process required.
@@ -71,17 +75,20 @@ This project is a Python command-line tool. No build process required.
 - Put main logic in `main()` function
 - Use `if __name__ == "__main__":` guard for CLI entry point
 
-### Project-Specific Notes
+## Project-Specific Notes
+
+### Environment and API
 - Environment variable: `POE_API_KEY` must be set for the tool to work
 - API endpoint: `https://api.poe.com/usage/current_balance`
 - Dependencies: `requests` library for HTTP operations
-- Python version: 3.8+ (uses walrus operator in code, requires 3.8+)
+- Python version: 3.8+ (uses walrus operator and underscore literals)
 
 ### Critical Rules
 - NEVER commit or expose API keys or secrets
 - Always use environment variables for credentials
 - Never print sensitive information to stdout
 - Write errors to stderr, not stdout
+- Use Bearer token authentication for API calls
 
 ### Running the Tool
 ```bash
@@ -92,9 +99,18 @@ export POE_API_KEY="your_key"
 # Or inline
 POE_API_KEY="your_key" python3 poe_balance.py
 
-# With --since argument
+# With --since argument (billing period start day)
 ./poe_balance.py --since 15
 ```
+
+### Output Format
+Credits are displayed in human-readable format:
+| Range | Example |
+|-------|---------|
+| < 1,000 | `500` |
+| 1,000 - 999,999 | `150k` |
+| 1,000,000 - 999,999,999 | `1.5M` |
+| 1B+ | `1.2B` |
 
 ## Shell Script Guidelines (for `poe_balance.1h.sh`)
 
@@ -119,6 +135,11 @@ POE_API_KEY="your_key" python3 poe_balance.py
   ```
 - Use `templateImage=` for icons that adapt to dark/light mode
 - Use `image=` for fixed-color icons
+- Include xbar variables for user configuration:
+  ```bash
+  #<xbar.var>boolean(VAR_NAME="true"): Description</xbar.var>
+  #<xbar.var>number(VAR_NAME="21"): Description</xbar.var>
+  ```
 
 ## Dependency Management
 
