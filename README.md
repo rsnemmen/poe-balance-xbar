@@ -36,7 +36,7 @@ This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plu
 *To display balance as percentage:*
 
 ```shell
-#<xbar.var>boolean(VAR_PERCENT="true"): Display remaining balance as percentage?.</xbar.var>
+#<xbar.var>boolean(VAR_PERCENT="true"): Display remaining balance as percentage.</xbar.var>
 ```
 (set it to `false` to display actual credits).
 
@@ -49,23 +49,25 @@ For example, the line above defines the starting of the billing period in the 21
 
 ## Command-line tool usage
 
-(1) Set your POE API key in `.bashrc` or `.zshrc` (depending on your shell):
+**Prerequisites:**
+- Python 3.8 or higher
+- `requests` library: `pip install requests`
+
+(1) Make the script executable:
+
+    chmod +x poe_balance.py
+
+(2) Set your POE API key in `.bashrc` or `.zshrc` (depending on your shell):
 
     export POE_API_KEY="your_api_key_here"
 
-(2) Run the tool to display credits:
+(3) Run the tool to display credits:
 
     ./poe_balance.py
 
-(3) Shows expected balance assuming uniform usage (specify the starting day of your Poe account as an argument, here for example on the 15th):
+(4) Shows expected balance assuming uniform usage (specify the starting day of your Poe account as an argument, here for example on the 15th):
 
-	./poe_balance --since 15
-
-**Note:** Please make sure `requests` is installed in your Python environment:
-
-```bash
-pip install requests
-```
+	./poe_balance.py --since 15
 
 
 ## Output
