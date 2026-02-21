@@ -95,11 +95,11 @@ format_number() {
   if [ "$n" -lt 1000 ]; then
     echo "${prefix}${n}"
   elif [ "$n" -lt 1000000 ]; then
-    echo "${prefix}$((n / 1000))k"
+    echo "${prefix}$(round "$n / 1000")k"
   elif [ "$n" -lt 1000000000 ]; then
-    echo "${prefix}$(echo "scale=1; $n / 1000000" | bc | sed 's/\.0$//')M"
+    echo "${prefix}$(printf "%.1f" "$(echo "scale=10; $n / 1000000" | bc)" | sed 's/\.0$//')M"
   else
-    echo "${prefix}$(echo "scale=1; $n / 1000000000" | bc | sed 's/\.0$//')B"
+    echo "${prefix}$(printf "%.1f" "$(echo "scale=10; $n / 1000000000" | bc)" | sed 's/\.0$//')B"
   fi
 }
 
