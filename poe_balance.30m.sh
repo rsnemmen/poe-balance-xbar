@@ -150,6 +150,9 @@ if [ -n "$STARTING_DATE" ] && [ "$STARTING_DATE" -gt 0 ]; then
 
   # Expected remaining balance based on uniform usage
   ESTIMATED=$(round "$INITIAL_BALANCE - ($DAYS_ELAPSED * $DAILY_CREDITS)")
+  if [ "$ESTIMATED" -lt 0 ]; then
+    ESTIMATED=0
+  fi
   est_pct=$(round "$ESTIMATED / 10000")
 
   # Actual daily burn rate (credits consumed / days elapsed)
