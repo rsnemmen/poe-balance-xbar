@@ -67,7 +67,7 @@ http_code="$(printf '%s\n' "$response" | tail -n 1)"
 body="$(printf '%s\n' "$response" | sed '$d')"
 
 if [ -z "$http_code" ] || [ "$http_code" = "000" ]; then
-  echo "? | templateImage=$POE_ICON color=#888888"
+  echo "? | templateImage=$POE_ICON"
   echo "---"
   echo "No internet connection"
   exit 0
