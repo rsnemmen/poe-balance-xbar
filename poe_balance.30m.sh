@@ -3,7 +3,7 @@
 #<xbar.version>1.0</xbar.version>
 #<xbar.author>Rodrigo Nemmen da Silva</xbar.author>
 #<xbar.desc>Display remaining Poe API credits</xbar.desc>
-#<xbar.image>https://github.com/rsnemmen/poe-balance/blob/780b20c79f3433f1908353888a6fa59217f3b8f9/images/cover.png</xbar.image>
+#<xbar.image>https://raw.githubusercontent.com/rsnemmen/poe-balance/780b20c79f3433f1908353888a6fa59217f3b8f9/images/cover.png</xbar.image>
 #<xbar.dependencies>curl,bc</xbar.dependencies>
 
 # User variables
@@ -51,13 +51,14 @@ fi
 API_KEY="${API_KEY:-${POE_API_KEY:-}}"
 
 if [ -z "$API_KEY" ]; then
-  echo "⚠️ No API Key"
-  echo "Missing API key. Set API_KEY via export POE_API_KEY in .bashrc or .zshrc." >&2
-  exit 1
+  echo "! | templateImage=$POE_ICON"
+  echo "---"
+  echo "Missing API key. Set POE_API_KEY in .bashrc or .zshrc."
+  exit 0
 fi
 
 # === Fetch balance ===
-response="$(curl -s -w "\n%{http_code}" \
+response="$(curl -s --connect-timeout 5 --max-time 10 -w "\n%{http_code}" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Accept: application/json" \
   "https://api.poe.com/usage/current_balance")"
@@ -65,22 +66,31 @@ response="$(curl -s -w "\n%{http_code}" \
 http_code="$(printf '%s\n' "$response" | tail -n 1)"
 body="$(printf '%s\n' "$response" | sed '$d')"
 
-if [ "$http_code" = "401" ]; then
-  echo "⚠️ Invalid Key"
-  exit 1
+if [ -z "$http_code" ] || [ "$http_code" = "000" ]; then
+  echo "? | templateImage=$POE_ICON color=#888888"
+  echo "---"
+  echo "No internet connection"
+  exit 0
+elif [ "$http_code" = "401" ]; then
+  echo "! | templateImage=$POE_ICON"
+  echo "---"
+  echo "Invalid API key (401)"
+  exit 0
 elif [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
-  echo "⚠️ POE API Error ($http_code)"
-  echo "Response body: $body" >&2
-  exit 1
+  echo "! | templateImage=$POE_ICON"
+  echo "---"
+  echo "API error: HTTP $http_code"
+  exit 0
 fi
 
 # Extract balance from JSON (kept simple; assumes integer field)
 balance="$(printf '%s\n' "$body" | sed -n 's/.*"current_point_balance"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p')"
 
 if [ -z "$balance" ]; then
-  echo "⚠️ Parse Error"
-  echo "Could not parse current_point_balance from: $body" >&2
-  exit 1
+  echo "! | templateImage=$POE_ICON"
+  echo "---"
+  echo "Could not parse balance from API response"
+  exit 0
 fi
 
 # === Format number ===
