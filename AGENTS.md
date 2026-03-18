@@ -80,6 +80,9 @@ This project is a Python command-line tool. No build process required.
 - Dependencies: `requests` library for HTTP operations
 - Python version: 3.13+
 
+### Shell Script API Key Discovery Chain
+The shell script uses a multi-method discovery chain (env var → `.zshrc` → `.zshenv` → `.bashrc`) because SwiftBar runs as a GUI app without shell environment. **Do not simplify this chain** — all fallback methods are intentional.
+
 ### Critical Rules
 - NEVER commit or expose API keys or secrets
 - Always use environment variables for credentials
@@ -122,7 +125,7 @@ Credits are displayed in human-readable format:
 - Use `set -euo pipefail` at the top of scripts when appropriate
 - Always check exit codes from critical commands
 - Redirect errors to stderr: `echo "Error" >&2`
-- Use `exit 1` for error conditions
+- For SwiftBar plugins, always use `exit 0` for error conditions — `exit 1` prevents SwiftBar from showing the Poe icon with an error indicator. Use `exit 1` only in the Python CLI tool.
 
 ### SwiftBar/xbar Plugin Format
 - Include metadata comments at the top:
@@ -138,6 +141,12 @@ Credits are displayed in human-readable format:
   #<xbar.var>number(VAR_NAME="21"): Description</xbar.var>
   ```
 
+### SwiftBar Output Protocol
+- **First `echo` line** = menu bar text; pipe-separated params: `templateImage=`, `color=`, `image=`
+- **`echo "---"`** = separator between the menu bar line and dropdown items
+- **Subsequent lines** = dropdown menu items
+- **Always `exit 0` on errors** — never `exit 1` from the plugin; SwiftBar needs `exit 0` to show the Poe icon with an error indicator
+
 ## Dependency Management
 
 ### Python Dependencies
@@ -147,6 +156,7 @@ Credits are displayed in human-readable format:
 ### Shell Script Dependencies
 - Document dependencies in `<xbar.dependencies>` comment
 - Currently requires: `curl`, `bc`
+- Uses `sed` for JSON parsing (no `jq` dependency) and `bc` for floating-point math — this is intentional to keep dependencies minimal. Do not introduce `jq` or other external tools.
 
 ## Git Workflow
 
