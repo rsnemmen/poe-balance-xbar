@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a Python CLI tool and SwiftBar/xbar plugin to display remaining Poe API credits. The tool queries the Poe API to get the current point balance and optionally calculates expected credits based on average usage.
+This is a Python CLI tool and SwiftBar/xbar plugin to display remaining Poe API points. The tool queries the Poe API to get the current point balance and optionally calculates expected points based on average usage.
 
 ## Build, Lint, and Test Commands
 
@@ -104,7 +104,7 @@ POE_API_KEY="your_key" python3 poe_balance.py
 ```
 
 ### Output Format
-Credits are displayed in human-readable format:
+Points are displayed in human-readable format:
 | Range | Example |
 |-------|---------|
 | < 1,000 | `500` |

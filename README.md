@@ -14,13 +14,13 @@ You can find your API key by [going here](https://poe.com/api_key).
 
 This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plugin to display your remaining Poe balance in the MacOS menu bar. It can display the balance in one of the following ways:
 
-![Balance remaining](images/credits.png)  
-`Poe: 670k` ← actual credits remaining  
+![Balance remaining](images/points.png)
+`Poe: 670k` ← actual points remaining
 
-![Percentage remaining](images/percent.png)  
-`Poe: 67%` ← percentage remaining  
+![Percentage remaining](images/percent.png)
+`Poe: 67%` ← percentage remaining
 
-`Poe: 670k (Est.: 720k)` ← (a) actual credits remaining and (b) expected credits today assuming the user consumes the same amount of credits everyday throughout the month. Example: if your credit starts at 1E6 units and 1 day has passed, you are expected 967k credits remaining for typical usage. “Est.” can be useful to judge if you are overspending your credits.  
+`Poe: 670k (Est.: 720k)` ← (a) actual points remaining and (b) expected points today assuming the user consumes the same amount of points everyday throughout the month. Example: if your point balance starts at 1E6 units and 1 day has passed, you are expected 967k points remaining for typical usage. “Est.” can be useful to judge if you are overspending your points.
 
 ![More details](images/percent_est.png)  
 `Poe: 67% (Est.: 72%)` ← same as above in percentage
@@ -38,9 +38,9 @@ This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plu
 ```shell
 #<xbar.var>boolean(VAR_PERCENT="true"): Display remaining balance as percentage.</xbar.var>
 ```
-(set it to `false` to display actual credits).
+(set it to `false` to display actual points).
 
-*To display the estimated credits remaining today assuming average use*, change this line:
+*To display the estimated points remaining today assuming average use*, change this line:
 
 ```shell
 #<xbar.var>number(VAR_STARTING_DATE="21"): Billing period starting date (1-31). Set to 0 to disable.</xbar.var>
@@ -61,7 +61,7 @@ For example, the line above defines the starting of the billing period in the 21
 
     export POE_API_KEY="your_api_key_here"
 
-(3) Run the tool to display credits:
+(3) Run the tool to display points:
 
     ./poe_balance.py
 
@@ -72,7 +72,7 @@ For example, the line above defines the starting of the billing period in the 21
 
 ## Output
 
-Credits are displayed in human-readable format:
+Points are displayed in human-readable format:
 
 | Range | Example |
 |------|-------|

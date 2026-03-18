@@ -61,8 +61,8 @@ def days_since_day(since_day: int) -> int:
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="poe-credits",
-        description="Display remaining POE API credits",
+        prog="poe-points",
+        description="Display remaining POE API points",
     )
     parser.add_argument(
         "--since",
@@ -95,7 +95,7 @@ def main():
     elif args.since is not None:
         print(format_number(balance), end=", ")
         initial_balance=1e6
-        dbalance=initial_balance/30.4 # expected credit usage per day
+        dbalance=initial_balance/30.4 # expected point usage per day
         days = days_since_day(args.since)
         #print(f"Days passed since day {args.since}: {days}", end=" ")
         balance_expected=initial_balance-days*dbalance
