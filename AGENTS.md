@@ -14,13 +14,10 @@ This project is a Python command-line tool. No build process required.
 - **Run type checker**: `mypy .`
 
 ### Testing
-- **Run all tests**: `python -m pytest` (no tests currently exist)
-- **Run specific test**: `python -m pytest tests/test_name.py::test_function_name`
-- **Run single test file**: `python -m pytest tests/test_file.py`
+- No tests currently exist
 
 ### Git Hooks
-- Pre-commit hook runs ruff and mypy checks
-- Run `pre-commit install` to set up hooks
+- Pre-commit hooks not currently configured
 
 ## Code Style Guidelines
 
@@ -81,7 +78,7 @@ This project is a Python command-line tool. No build process required.
 - Environment variable: `POE_API_KEY` must be set for the tool to work
 - API endpoint: `https://api.poe.com/usage/current_balance`
 - Dependencies: `requests` library for HTTP operations
-- Python version: 3.8+ (uses walrus operator and underscore literals)
+- Python version: 3.13+
 
 ### Critical Rules
 - NEVER commit or expose API keys or secrets
@@ -112,7 +109,7 @@ Credits are displayed in human-readable format:
 | 1,000,000 - 999,999,999 | `1.5M` |
 | 1B+ | `1.2B` |
 
-## Shell Script Guidelines (for `poe_balance.1h.sh`)
+## Shell Script Guidelines (for `poe_balance.30m.sh`)
 
 ### Bash Style
 - Use `#!/usr/bin/env bash` shebang
@@ -153,12 +150,6 @@ Credits are displayed in human-readable format:
 
 ## Git Workflow
 
-### Pre-Commit Setup
-```bash
-# Install pre-commit hooks
-pre-commit install
-```
-
 ### Commit Guidelines
 - Use present tense ("Add feature" not "Added feature")
 - Use imperative mood ("Move cursor to..." not "Moves cursor to...")
@@ -166,8 +157,5 @@ pre-commit install
 - Reference issues and pull requests liberally after first line
 
 ### Testing Best Practices
-- Create test files in `tests/` directory: `test_<module>.py`
-- Name test functions: `test_<function_name>`
-- Use pytest fixtures for common setup
-- Mock external API calls in tests
+- Tests should mock external API calls
 - Tests should not require real API keys
