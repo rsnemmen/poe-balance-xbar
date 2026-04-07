@@ -4,20 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A SwiftBar/xbar plugin and CLI tool that displays remaining Poe API points in the macOS menu bar. Two implementations exist:
+A SwiftBar/xbar plugin that displays remaining Poe API points in the macOS menu bar.
 
-- **`poe_balance.30m.sh`** — Bash script, the SwiftBar plugin (runs every 30 minutes). This is the primary, feature-complete implementation. Handles menu bar display, dropdown details, color-coded warnings, billing cycle estimation, and compact display mode.
-- **`poe_balance.py`** — Python CLI tool with a subset of features (balance display and `--since` estimation). Requires `requests` (`pip install requests`).
+- **`poe_balance.30m.sh`** — Bash script, the SwiftBar plugin (runs every 30 minutes). Handles menu bar display, dropdown details, color-coded warnings, billing cycle estimation, and compact display mode.
 
-Both query `https://api.poe.com/usage/current_balance` using Bearer token auth via the `POE_API_KEY` environment variable.
-
-## Lint Commands
-
-```bash
-ruff check .            # Python linter
-ruff check --fix .      # Auto-fix
-mypy .                  # Type checking
-```
+Queries `https://api.poe.com/usage/current_balance` using Bearer token auth via the `POE_API_KEY` environment variable.
 
 No tests exist. No build step required.
 
@@ -27,7 +18,7 @@ The shell script has a multi-method API key discovery chain (env var -> `.zshrc`
 
 The shell script uses `sed` to parse JSON (no `jq` dependency) and `bc` for floating-point math. Dependencies are intentionally minimal (`curl`, `bc`).
 
-Key constants shared between both implementations:
+Key constants:
 - `INITIAL_BALANCE = 1,000,000` (monthly Poe point allocation)
 - `DAILY_POINTS = 32,895` (1M / 30.4 days)
 

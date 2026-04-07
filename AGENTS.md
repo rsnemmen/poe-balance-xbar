@@ -2,115 +2,11 @@
 
 ## Project Overview
 
-This is a Python CLI tool and SwiftBar/xbar plugin to display remaining Poe API points. The tool queries the Poe API to get the current point balance and optionally calculates expected points based on average usage.
+This is a SwiftBar/xbar plugin to display remaining Poe API points in the macOS menu bar. The tool queries the Poe API to get the current point balance and optionally calculates expected points based on average usage.
 
 ## Build, Lint, and Test Commands
 
-This project is a Python command-line tool. No build process required.
-
-### Linting
-- **Run linter**: `ruff check .`
-- **Auto-fix linting issues**: `ruff check --fix .`
-- **Run type checker**: `mypy .`
-
-### Testing
-- No tests currently exist
-
-### Git Hooks
-- Pre-commit hooks not currently configured
-
-## Code Style Guidelines
-
-### Imports
-- Standard library imports first (os, sys, argparse, etc.)
-- Third-party imports second (requests)
-- Local imports third
-- Group imports with blank lines between each group
-
-### Formatting
-- Use 4 spaces for indentation (no tabs)
-- Maximum line length of 88 characters (PEP 8)
-- Use blank lines to separate functions and classes
-- Use blank lines within functions sparingly to separate logical sections
-- No trailing whitespace
-- End files with a single newline
-
-### Type Hints
-- Use type hints for all function parameters and return values
-- Use `Optional[T]` for parameters that can be None
-- Use `Union[T, U]` for parameters accepting multiple types
-- Use built-in types like `int`, `str`, `list`, `dict` over `typing` module where appropriate
-- Example:
-  ```python
-  def format_number(n: int) -> str: ...
-  def get_balance(api_key: str) -> Optional[int]: ...
-  ```
-
-### Naming Conventions
-- Variables and functions: `snake_case`
-- Classes: `PascalCase`
-- Constants: `UPPER_CASE`
-- Use descriptive names; avoid abbreviations unless widely understood
-- Private module-level variables: leading underscore (e.g., `_api_endpoint`)
-
-### Error Handling
-- Prefer explicit exception handling over silent failures
-- Use `try/except/finally` blocks for error-prone code (especially network operations)
-- Raise appropriate built-in exceptions (ValueError, TypeError, etc.)
-- Use `sys.exit(1)` with descriptive error messages for CLI errors
-
-### Documentation
-- Include docstrings for all public functions and classes
-- Use triple double quotes `"""` for docstrings (not single quotes)
-- Document all parameters and return values
-- Include examples in docstrings when helpful
-- Keep docstrings concise but informative
-
-### Code Structure
-- Keep functions focused and single-purpose
-- Maximum ~50 lines per function when possible
-- Put main logic in `main()` function
-- Use `if __name__ == "__main__":` guard for CLI entry point
-
-## Project-Specific Notes
-
-### Environment and API
-- Environment variable: `POE_API_KEY` must be set for the tool to work
-- API endpoint: `https://api.poe.com/usage/current_balance`
-- Dependencies: `requests` library for HTTP operations
-- Python version: 3.13+
-
-### Shell Script API Key Discovery Chain
-The shell script uses a multi-method discovery chain (env var → `.zshrc` → `.zshenv` → `.bashrc`) because SwiftBar runs as a GUI app without shell environment. **Do not simplify this chain** — all fallback methods are intentional.
-
-### Critical Rules
-- NEVER commit or expose API keys or secrets
-- Always use environment variables for credentials
-- Never print sensitive information to stdout
-- Write errors to stderr, not stdout
-- Use Bearer token authentication for API calls
-
-### Running the Tool
-```bash
-# With environment variable
-export POE_API_KEY="your_key"
-./poe_balance.py
-
-# Or inline
-POE_API_KEY="your_key" python3 poe_balance.py
-
-# With --since argument (billing period start day)
-./poe_balance.py --since 15
-```
-
-### Output Format
-Points are displayed in human-readable format:
-| Range | Example |
-|-------|---------|
-| < 1,000 | `500` |
-| 1,000 - 999,999 | `150k` |
-| 1,000,000 - 999,999,999 | `1.5M` |
-| 1B+ | `1.2B` |
+No build process required. No tests currently exist. No pre-commit hooks configured.
 
 ## Shell Script Guidelines (for `poe_balance.30m.sh`)
 
@@ -125,7 +21,7 @@ Points are displayed in human-readable format:
 - Use `set -euo pipefail` at the top of scripts when appropriate
 - Always check exit codes from critical commands
 - Redirect errors to stderr: `echo "Error" >&2`
-- For SwiftBar plugins, always use `exit 0` for error conditions — `exit 1` prevents SwiftBar from showing the Poe icon with an error indicator. Use `exit 1` only in the Python CLI tool.
+- For SwiftBar plugins, always use `exit 0` for error conditions — `exit 1` prevents SwiftBar from showing the Poe icon with an error indicator.
 
 ### SwiftBar/xbar Plugin Format
 - Include metadata comments at the top:
@@ -145,18 +41,42 @@ Points are displayed in human-readable format:
 - **First `echo` line** = menu bar text; pipe-separated params: `templateImage=`, `color=`, `image=`
 - **`echo "---"`** = separator between the menu bar line and dropdown items
 - **Subsequent lines** = dropdown menu items
-- **Always `exit 0` on errors** — never `exit 1` from the plugin; SwiftBar needs `exit 0` to show the Poe icon with an error indicator
+- **Always `exit 0` on errors** — never `exit 1` from the plugin
 
-## Dependency Management
+## Project-Specific Notes
 
-### Python Dependencies
-- No formal requirements.txt - install manually: `pip install requests`
-- Keep dependencies minimal (only `requests` currently required)
+### Environment and API
+- Environment variable: `POE_API_KEY` must be set for the tool to work
+- API endpoint: `https://api.poe.com/usage/current_balance`
+- Dependencies: `curl`, `bc`
 
-### Shell Script Dependencies
+### Shell Script API Key Discovery Chain
+The shell script uses a multi-method discovery chain (env var → `.zshrc` → `.zshenv` → `.bashrc`) because SwiftBar runs as a GUI app without shell environment. **Do not simplify this chain** — all fallback methods are intentional.
+
+### Critical Rules
+- NEVER commit or expose API keys or secrets
+- Always use environment variables for credentials
+- Never print sensitive information to stdout
+- Write errors to stderr, not stdout
+- Use Bearer token authentication for API calls
+
+### Output Format
+Points are displayed in human-readable format:
+| Range | Example |
+|-------|---------|
+| < 1,000 | `500` |
+| 1,000 - 999,999 | `150k` |
+| 1,000,000 - 999,999,999 | `1.5M` |
+| 1B+ | `1.2B` |
+
+### Key Constants
+- `INITIAL_BALANCE = 1,000,000` (monthly Poe point allocation)
+- `DAILY_POINTS = 32,895` (1M / 30.4 days)
+
+### Dependencies
 - Document dependencies in `<xbar.dependencies>` comment
 - Currently requires: `curl`, `bc`
-- Uses `sed` for JSON parsing (no `jq` dependency) and `bc` for floating-point math — this is intentional to keep dependencies minimal. Do not introduce `jq` or other external tools.
+- Uses `sed` for JSON parsing (no `jq` dependency) and `bc` for floating-point math — this is intentional. Do not introduce `jq` or other external tools.
 
 ## Git Workflow
 
@@ -165,7 +85,3 @@ Points are displayed in human-readable format:
 - Use imperative mood ("Move cursor to..." not "Moves cursor to...")
 - Limit first line to 72 characters
 - Reference issues and pull requests liberally after first line
-
-### Testing Best Practices
-- Tests should mock external API calls
-- Tests should not require real API keys

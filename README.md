@@ -47,29 +47,6 @@ This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plu
 ```
 For example, the line above defines the starting of the billing period in the 21st of each month.
 
-## Command-line tool usage
-
-**Prerequisites:**
-- Python 3.8 or higher
-- `requests` library: `pip install requests`
-
-(1) Make the script executable:
-
-    chmod +x poe_balance.py
-
-(2) Set your POE API key in `.bashrc` or `.zshrc` (depending on your shell):
-
-    export POE_API_KEY="your_api_key_here"
-
-(3) Run the tool to display points:
-
-    ./poe_balance.py
-
-(4) Shows expected balance assuming uniform usage (specify the starting day of your Poe account as an argument, here for example on the 15th):
-
-	./poe_balance.py --since 15
-
-
 ## Output
 
 Points are displayed in human-readable format:
