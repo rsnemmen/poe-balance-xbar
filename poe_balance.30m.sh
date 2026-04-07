@@ -93,8 +93,8 @@ if [ -z "$balance" ]; then
   exit 0
 fi
 
-# === Format number ===
-# (e.g., 693000 -> 693k)
+# === Format number (3 significant figures) ===
+# (e.g., 693456 -> 693k, 52341 -> 52.3k, 5234 -> 5.23k, 1140000 -> 1.14M)
 format_number() {
   local n="$1"
   local prefix=""
@@ -102,14 +102,24 @@ format_number() {
     prefix="-"
     n=$((-n))
   fi
+  # Helper: strip trailing zeros after decimal (e.g., "1.00" -> "1", "5.20" -> "5.2")
+  strip_zeros() { echo "$1" | sed 's/\.00$//' | sed 's/\(\.[0-9]\)0$/\1/'; }
   if [ "$n" -lt 1000 ]; then
     echo "${prefix}${n}"
+  elif [ "$n" -lt 10000 ]; then
+    echo "${prefix}$(strip_zeros "$(printf "%.2f" "$(echo "scale=10; $n / 1000" | bc)")")k"
+  elif [ "$n" -lt 100000 ]; then
+    echo "${prefix}$(strip_zeros "$(printf "%.1f" "$(echo "scale=10; $n / 1000" | bc)")")k"
   elif [ "$n" -lt 1000000 ]; then
     echo "${prefix}$(round "$n / 1000")k"
+  elif [ "$n" -lt 10000000 ]; then
+    echo "${prefix}$(strip_zeros "$(printf "%.2f" "$(echo "scale=10; $n / 1000000" | bc)")")M"
+  elif [ "$n" -lt 100000000 ]; then
+    echo "${prefix}$(strip_zeros "$(printf "%.1f" "$(echo "scale=10; $n / 1000000" | bc)")")M"
   elif [ "$n" -lt 1000000000 ]; then
-    echo "${prefix}$(printf "%.1f" "$(echo "scale=10; $n / 1000000" | bc)" | sed 's/\.0$//')M"
+    echo "${prefix}$(round "$n / 1000000")M"
   else
-    echo "${prefix}$(printf "%.1f" "$(echo "scale=10; $n / 1000000000" | bc)" | sed 's/\.0$//')B"
+    echo "${prefix}$(strip_zeros "$(printf "%.2f" "$(echo "scale=10; $n / 1000000000" | bc)")")B"
   fi
 }
 
@@ -123,7 +133,6 @@ formatted="$(format_number "$balance")"
 # === Compute derived values ===
 consumed=$((INITIAL_BALANCE - balance))
 pct=$(round "$balance / 10000")
-consumed_pct=$(round "$consumed / 10000")
 
 # Determine color based on percentage (if enabled)
 COLOR=""
@@ -208,7 +217,6 @@ if [ "$PERCENT" = "true" ]; then
 else
   echo "Balance: ${pct}%"
 fi
-echo "Consumed: $(format_number "$consumed") (${consumed_pct}%)"
 
 # Billing cycle info
 if [ "$HAVE_CYCLE" = "true" ]; then
