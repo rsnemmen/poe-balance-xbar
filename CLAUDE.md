@@ -22,7 +22,7 @@ Key constants:
 - `INITIAL_BALANCE = 1,000,000` (monthly Poe point allocation)
 - `DAILY_POINTS = 32,895` (1M / 30.4 days)
 
-SwiftBar plugin metadata (`#<xbar.var>` comments) controls user-configurable variables: `VAR_STARTING_DATE`, `VAR_PERCENT`, `VAR_COMPACT`, `VAR_COLORS`.
+SwiftBar plugin metadata (`#<xbar.var>` comments) controls user-configurable variables: `VAR_STARTING_DATE`, `VAR_PERCENT`, `VAR_COMPACT`, `VAR_COLORS`, `VAR_MINIMAL_MENUBAR`.
 
 ## SwiftBar Output Protocol
 
