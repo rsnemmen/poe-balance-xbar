@@ -20,18 +20,27 @@ This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plu
 ![Percentage remaining](images/percent.png)
 `Poe: 67%` ← percentage remaining
 
-`Poe: 670k (Est.: 720k)` ← (a) actual points remaining and (b) expected points today assuming the user consumes the same amount of points everyday throughout the month. Example: if your point balance starts at 1E6 units and 1 day has passed, you are expected 967k points remaining for typical usage. “Est.” can be useful to judge if you are overspending your points.
+`Poe: 670k (Est.: 720k)` ← (a) actual points remaining and (b) expected points today assuming the user consumes the same amount of points everyday throughout the month. Example: if your point balance starts at 1E6 units and 1 day has passed, you are expected 967k points remaining for typical usage. "Est." can be useful to judge if you are overspending your points.
 
 ![More details](images/percent_est.png)  
 `Poe: 67% (Est.: 72%)` ← same as above in percentage
+
+When a billing cycle is configured, the dropdown menu shows additional details:
+
+```
+Day 12 of 30 (18 days until renewal)
+Expected balance now: 605k (60%)
+Daily burn: 27.3k (expected: 32.9k)
+Projected end balance: 117k
+```
 
 ### Installing and configuring the SwiftBar plugin
 
 (1) Install [SwiftBar](https://github.com/swiftbar/SwiftBar) (can be installed with Homebrew: `brew install swiftbar`).  
 
-(2) Place `poe_balance.1h.sh` in your SwiftBar plugins folder.  
+(2) Place `poe_balance.30m.sh` in your SwiftBar plugins folder.  
 
-(3) Change the following variables in `poe_balance.1h.sh` to define how you would like the menu app to behave.  
+(3) Change the following variables in `poe_balance.30m.sh` to define how you would like the menu app to behave.  
 
 *To display balance as percentage:*
 
@@ -47,6 +56,13 @@ This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plu
 ```
 For example, the line above defines the starting of the billing period in the 21st of each month.
 
+*To keep the menu bar minimal* (show only the current balance, with billing cycle details in the dropdown only):
+
+```shell
+#<xbar.var>boolean(VAR_MINIMAL_MENUBAR="false"): Keep menu bar minimal (current balance only) even when a billing cycle is configured?.</xbar.var>
+```
+Set to `true` to display just `67%` or `670k` in the menu bar regardless of `VAR_STARTING_DATE`, while still showing the full cycle breakdown in the dropdown.
+
 ## Output
 
 Points are displayed in human-readable format:
@@ -57,4 +73,3 @@ Points are displayed in human-readable format:
 | 1,000 - 999,999 | `150k` |
 | 1,000,000 - 999,999,999 | `1.5M` |
 | 1B+ | `1.2B` |
-
