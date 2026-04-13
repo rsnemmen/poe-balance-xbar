@@ -14,11 +14,13 @@
 #<xbar.var>boolean(VAR_PERCENT="true"): Display remaining balance as percentage?.</xbar.var>
 #<xbar.var>boolean(VAR_COMPACT="false"): Use compact display format (e.g., 520k/600k)?.</xbar.var>
 #<xbar.var>boolean(VAR_COLORS="true"): Enable color coding for low balance?.</xbar.var>
+#<xbar.var>boolean(VAR_MINIMAL_MENUBAR="false"): Keep menu bar minimal (current balance only) even when a billing cycle is configured?.</xbar.var>
 
 STARTING_DATE=$VAR_STARTING_DATE
 PERCENT=$VAR_PERCENT
 COMPACT=$VAR_COMPACT
 COLORS=$VAR_COLORS
+MINIMAL_MENUBAR=$VAR_MINIMAL_MENUBAR
 INITIAL_BALANCE=1000000
 DAILY_POINTS=32895  # 1M / 30.4 days
 
@@ -186,8 +188,13 @@ if [ -n "$STARTING_DATE" ] && [ "$STARTING_DATE" -gt 0 ]; then
 fi
 
 # === Menu bar header ===
+SHOW_CYCLE_IN_MENUBAR="$HAVE_CYCLE"
+if [ "$MINIMAL_MENUBAR" = "true" ]; then
+  SHOW_CYCLE_IN_MENUBAR=false
+fi
+
 if [ "$PERCENT" = "true" ]; then
-  if [ "$HAVE_CYCLE" = "true" ]; then
+  if [ "$SHOW_CYCLE_IN_MENUBAR" = "true" ]; then
     if [ "$COMPACT" = "true" ]; then
       echo "${pct}%/${est_pct}% | templateImage=$POE_ICON color=${COLOR}"
     else
@@ -197,7 +204,7 @@ if [ "$PERCENT" = "true" ]; then
     echo "${pct}% | templateImage=$POE_ICON color=${COLOR}"
   fi
 else
-  if [ "$HAVE_CYCLE" = "true" ]; then
+  if [ "$SHOW_CYCLE_IN_MENUBAR" = "true" ]; then
     if [ "$COMPACT" = "true" ]; then
       echo "$formatted/$(format_number "$ESTIMATED") | templateImage=$POE_ICON color=${COLOR}"
     else
@@ -224,7 +231,8 @@ if [ "$HAVE_CYCLE" = "true" ]; then
   DAYS_E=$(echo "scale=0; $DAYS_ELAPSED / 1" | bc)
   DAYS_R=$(round "$DAYS_REMAINING")
   TOTAL_DAYS=$((DAYS_E + DAYS_R))
-  echo "Day ${DAYS_E} of ${TOTAL_DAYS} (${DAYS_R} remaining)"
+  echo "Day ${DAYS_E} of ${TOTAL_DAYS} (${DAYS_R} days until renewal)"
+  echo "Expected balance now: $(format_number "$ESTIMATED") (${est_pct}%)"
   echo "Daily burn: $(format_number "$ACTUAL_DAILY_BURN") (expected: $(format_number "$DAILY_POINTS"))"
   echo "Projected end balance: $(format_number "$PROJECTED")"
 fi
