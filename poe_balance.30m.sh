@@ -38,17 +38,17 @@ fi
 
 # Method 2: from Z shell config file (works for GUI apps like SwiftBar)
 if [ -z "$API_KEY" ] && [ -f "$HOME/.zshrc" ]; then
-    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.zshrc" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.zshrc" | cut -d'=' -f2- | tr -d '"' | tr -d "'")
 fi
 
 # Method 3: from Z shell env file (sourced by all zsh shells)
 if [ -z "$API_KEY" ] && [ -f "$HOME/.zshenv" ]; then
-    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.zshenv" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.zshenv" | cut -d'=' -f2- | tr -d '"' | tr -d "'")
 fi
 
 # Method 4: from bash config file 
 if [ -z "$API_KEY" ] && [ -f "$HOME/.bashrc" ]; then
-    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.bashrc" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+    API_KEY=$(grep '^export POE_API_KEY=' "$HOME/.bashrc" | cut -d'=' -f2- | tr -d '"' | tr -d "'")
 fi
 
 # Prefer SwiftBar-provided API_KEY; fallback to POE_API_KEY from environment
@@ -134,13 +134,9 @@ round() {
 
 is_positive_integer() {
   case "$1" in
-    ''|*[!0-9]*)
-      return 1
-      ;;
-    *)
-      [ "$1" -gt 0 ]
-      ;;
+    ''|*[!0-9]*) return 1 ;;
   esac
+  [ "$((10#$1))" -gt 0 ]
 }
 
 load_cycle_state() {
@@ -170,6 +166,10 @@ save_cycle_state() {
   fi
 }
 
+last_day_of_month() {  # args: year month
+  date -j -v"${1}"y -v"${2}"m -v1d -v+1m -v-1d +%d
+}
+
 formatted="$(format_number "$balance")"
 
 # === Compute derived values ===
@@ -195,6 +195,7 @@ if [ -n "$STARTING_DATE" ] && [ "$STARTING_DATE" != "0" ] && ! is_positive_integ
 fi
 
 if is_positive_integer "$STARTING_DATE"; then
+  STARTING_DATE=$((10#$STARTING_DATE))
   if [ "$STARTING_DATE" -gt 31 ]; then
     echo "! | templateImage=$POE_ICON"
     echo "---"
@@ -205,14 +206,37 @@ if is_positive_integer "$STARTING_DATE"; then
 
   TODAY=$((10#$(date +%d)))
   NOW_S=$(date +%s)
+  CURRENT_YEAR=$((10#$(date +%Y)))
+  CURRENT_MONTH=$((10#$(date +%m)))
 
   if [ "$STARTING_DATE" -le "$TODAY" ]; then
-    START_S=$(date -j -v"${STARTING_DATE}"d -v0H -v0M -v0S +%s)
-    END_S=$(date -j -v+1m -v"${STARTING_DATE}"d -v0H -v0M -v0S +%s)
+    START_Y=$CURRENT_YEAR
+    START_M=$CURRENT_MONTH
   else
-    START_S=$(date -j -v-1m -v"${STARTING_DATE}"d -v0H -v0M -v0S +%s)
-    END_S=$(date -j -v"${STARTING_DATE}"d -v0H -v0M -v0S +%s)
+    if [ "$CURRENT_MONTH" -eq 1 ]; then
+      START_Y=$((CURRENT_YEAR - 1))
+      START_M=12
+    else
+      START_Y=$CURRENT_YEAR
+      START_M=$((CURRENT_MONTH - 1))
+    fi
   fi
+
+  if [ "$START_M" -eq 12 ]; then
+    END_Y=$((START_Y + 1))
+    END_M=1
+  else
+    END_Y=$START_Y
+    END_M=$((START_M + 1))
+  fi
+
+  START_LAST=$(last_day_of_month "$START_Y" "$START_M")
+  END_LAST=$(last_day_of_month "$END_Y" "$END_M")
+  START_DAY=$(( STARTING_DATE < START_LAST ? STARTING_DATE : START_LAST ))
+  END_DAY=$(( STARTING_DATE < END_LAST ? STARTING_DATE : END_LAST ))
+
+  START_S=$(date -j -v"${START_Y}"y -v"${START_M}"m -v"${START_DAY}"d -v0H -v0M -v0S +%s)
+  END_S=$(date -j -v"${END_Y}"y -v"${END_M}"m -v"${END_DAY}"d -v0H -v0M -v0S +%s)
 
   DAYS_ELAPSED=$(echo "scale=4; ($NOW_S - $START_S) / 86400" | bc)
   DAYS_REMAINING=$(echo "scale=4; ($END_S - $NOW_S) / 86400" | bc)
@@ -261,22 +285,22 @@ fi
 if [ "$PERCENT" = "true" ]; then
   if [ "$SHOW_CYCLE_IN_MENUBAR" = "true" ]; then
     if [ "$COMPACT" = "true" ]; then
-      echo "${pct}%/${est_pct}% | templateImage=$POE_ICON color=${COLOR}"
+      echo "${pct}%/${est_pct}% | templateImage=$POE_ICON${COLOR:+ color=$COLOR}"
     else
-      echo "${pct}% (Est.: ${est_pct}%) | templateImage=$POE_ICON color=${COLOR}"
+      echo "${pct}% (Est.: ${est_pct}%) | templateImage=$POE_ICON${COLOR:+ color=$COLOR}"
     fi
   else
-    echo "${pct}% | templateImage=$POE_ICON color=${COLOR}"
+    echo "${pct}% | templateImage=$POE_ICON${COLOR:+ color=$COLOR}"
   fi
 else
   if [ "$SHOW_CYCLE_IN_MENUBAR" = "true" ]; then
     if [ "$COMPACT" = "true" ]; then
-      echo "$formatted/$(format_number "$ESTIMATED") | templateImage=$POE_ICON color=${COLOR}"
+      echo "$formatted/$(format_number "$ESTIMATED") | templateImage=$POE_ICON${COLOR:+ color=$COLOR}"
     else
-      echo "$formatted (Est.: $(format_number "$ESTIMATED")) | templateImage=$POE_ICON color=${COLOR}"
+      echo "$formatted (Est.: $(format_number "$ESTIMATED")) | templateImage=$POE_ICON${COLOR:+ color=$COLOR}"
     fi
   else
-    echo "$formatted | templateImage=$POE_ICON color=${COLOR}"
+    echo "$formatted | templateImage=$POE_ICON${COLOR:+ color=$COLOR}"
   fi
 fi
 
@@ -295,8 +319,9 @@ if [ "$HAVE_CYCLE" = "true" ]; then
   echo "---"
   DAYS_E=$(echo "scale=0; $DAYS_ELAPSED / 1" | bc)
   DAYS_R=$(round "$DAYS_REMAINING")
-  TOTAL_DAYS=$((DAYS_E + DAYS_R))
-  echo "Day ${DAYS_E} of ${TOTAL_DAYS} (${DAYS_R} days until renewal)"
+  TOTAL_DAYS=$(echo "scale=0; ($END_S - $START_S) / 86400" | bc)
+  DAY_NUM=$((DAYS_E + 1))
+  echo "Day ${DAY_NUM} of ${TOTAL_DAYS} (${DAYS_R} days until renewal)"
   echo "Cycle start balance: $(format_number "$CYCLE_START_BALANCE")"
   if [ -n "$BASELINE_NOTE" ]; then
     echo "$BASELINE_NOTE"
