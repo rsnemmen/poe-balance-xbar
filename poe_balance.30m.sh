@@ -10,7 +10,7 @@
 # ================
 # For detailed instructions, visit https://github.com/rsnemmen/poe-balance
 #
-#<xbar.var>number(VAR_STARTING_DATE="0"): Billing period starting date (1-31). Set to 0 to disable.</xbar.var>
+#<xbar.var>number(VAR_STARTING_DATE="0"): Billing period starting date (1-31). Set to 0 to disable cycle tracking.</xbar.var>
 #<xbar.var>boolean(VAR_PERCENT="true"): Display remaining balance as percentage?.</xbar.var>
 #<xbar.var>boolean(VAR_COMPACT="false"): Use compact display format (e.g., 520k/600k)?.</xbar.var>
 #<xbar.var>boolean(VAR_COLORS="true"): Enable color coding for low balance?.</xbar.var>
@@ -23,6 +23,8 @@ COLORS=$VAR_COLORS
 MINIMAL_MENUBAR=$VAR_MINIMAL_MENUBAR
 INITIAL_BALANCE=1000000
 DAILY_POINTS=32895  # 1M / 30.4 days
+STATE_DIR="$HOME/Library/Application Support/poe-balance"
+STATE_FILE="$STATE_DIR/cycle_state"
 
 POE_ICON="iVBORw0KGgoAAAANSUhEUgAAABIAAAAPCAYAAADphp8SAAAAAXNSR0IArs4c6QAAAJhlWElmTU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAABIAAAAAQAAAEgAAAABAASQBAACAAAAFAAAAISgAQADAAAAAQABAACgAgAEAAAAAQAAABKgAwAEAAAAAQAAAA8AAAAAMjAyNjowMzoyMCAwODoxNDo0MwBm6dBXAAAACXBIWXMAAAsTAAALEwEAmpwYAAABsmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNi4wLjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iPgogICAgICAgICA8eG1wOkNyZWF0b3JUb29sPkFkb2JlIFBob3Rvc2hvcCAyNy40IChNYWNpbnRvc2gpPC94bXA6Q3JlYXRvclRvb2w+CiAgICAgICAgIDx4bXA6Q3JlYXRlRGF0ZT4yMDI2LTAzLTIwVDA4OjE0OjQzPC94bXA6Q3JlYXRlRGF0ZT4KICAgICAgPC9yZGY6RGVzY3JpcHRpb24+CiAgIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+CiC5oOMAAAF5SURBVDgRpdI9KMVRGMfx46XL4DXvpbysZPA2WimDUhYWmZRFGcVMYrgpK8bLIGUg5S4GSiZFXuoio7ws3vn+dM7f8XeRPPW55znnf+7/nvM815iPSCHtxxWuv3HJei9+jGKevuD1F3c8z8On0CkUFehDORK4RzrSoHi2IozVOMQ8zhDEENkN5oIVY+rIs725TlDrzWPkKkGHtxZcZdQuNjPqigvephVynUo/oBiDSjCFKphUfdhw18xnrrzMPWAshfa62ri9Oaz1IKI67KABGVBsYRarcBElacGuXci04y1jIaJ6cwkGUINxnEPF1gncyzXXdTWvxCD00mO0o9Udkdw0IY4nuG6Rfgl9pwvdUJeXMOK/SDU5gLp1ikeEQwWOQ6cuQgJqzolq5EJ5FlSPdajduk44HljoxBq0ZwLb/hX0EnVhGZPYh7qVG1LAfBONGMYe3tus0YWutYEZtOEIya6of/gFppHs1EYb6rEIdfJfof+IavCneANwl1NxwdLNXQAAAABJRU5ErkJggg=="
 
@@ -130,10 +132,47 @@ round() {
   printf "%.0f" "$(echo "scale=10; $1" | bc)"
 }
 
+is_positive_integer() {
+  case "$1" in
+    ''|*[!0-9]*)
+      return 1
+      ;;
+    *)
+      [ "$1" -gt 0 ]
+      ;;
+  esac
+}
+
+load_cycle_state() {
+  SAVED_CYCLE_START=""
+  SAVED_START_BALANCE=""
+
+  if [ ! -f "$STATE_FILE" ]; then
+    return
+  fi
+
+  SAVED_CYCLE_START="$(sed -n 's/^cycle_start=//p' "$STATE_FILE")"
+  SAVED_START_BALANCE="$(sed -n 's/^start_balance=//p' "$STATE_FILE")"
+}
+
+save_cycle_state() {
+  local cycle_start="$1"
+  local start_balance="$2"
+
+  if ! mkdir -p "$STATE_DIR"; then
+    echo "Could not create state directory: $STATE_DIR" >&2
+    return 1
+  fi
+
+  if ! printf 'cycle_start=%s\nstart_balance=%s\n' "$cycle_start" "$start_balance" > "$STATE_FILE"; then
+    echo "Could not write state file: $STATE_FILE" >&2
+    return 1
+  fi
+}
+
 formatted="$(format_number "$balance")"
 
 # === Compute derived values ===
-consumed=$((INITIAL_BALANCE - balance))
 pct=$(round "$balance / 10000")
 
 # Determine color based on percentage (if enabled)
@@ -148,10 +187,19 @@ fi
 
 # Compute billing cycle info when STARTING_DATE is configured
 HAVE_CYCLE=false
-if [ -n "$STARTING_DATE" ] && [ "$STARTING_DATE" -gt 0 ]; then
+if [ -n "$STARTING_DATE" ] && [ "$STARTING_DATE" != "0" ] && ! is_positive_integer "$STARTING_DATE"; then
+  echo "! | templateImage=$POE_ICON"
+  echo "---"
+  echo "Invalid STARTING_DATE: $STARTING_DATE"
+  exit 0
+fi
+
+if is_positive_integer "$STARTING_DATE"; then
   if [ "$STARTING_DATE" -gt 31 ]; then
-    echo "⚠️ Invalid STARTING_DATE" >&2
-    exit 1
+    echo "! | templateImage=$POE_ICON"
+    echo "---"
+    echo "Invalid STARTING_DATE: $STARTING_DATE"
+    exit 0
   fi
   HAVE_CYCLE=true
 
@@ -168,9 +216,26 @@ if [ -n "$STARTING_DATE" ] && [ "$STARTING_DATE" -gt 0 ]; then
 
   DAYS_ELAPSED=$(echo "scale=4; ($NOW_S - $START_S) / 86400" | bc)
   DAYS_REMAINING=$(echo "scale=4; ($END_S - $NOW_S) / 86400" | bc)
+  BASELINE_NOTE=""
+
+  load_cycle_state
+  if [ "$SAVED_CYCLE_START" = "$START_S" ] && is_positive_integer "$SAVED_START_BALANCE"; then
+    CYCLE_START_BALANCE="$SAVED_START_BALANCE"
+  else
+    CYCLE_START_BALANCE="$balance"
+    if ! save_cycle_state "$START_S" "$CYCLE_START_BALANCE"; then
+      CYCLE_START_BALANCE="$INITIAL_BALANCE"
+      BASELINE_NOTE="Could not persist cycle baseline; using 1M default."
+    elif [ "$(echo "$DAYS_ELAPSED > 0" | bc)" -eq 1 ]; then
+      BASELINE_NOTE="Tracking from the first balance observed this cycle."
+    fi
+  fi
+
+  consumed=$((CYCLE_START_BALANCE - balance))
+  EXPECTED_DAILY_BURN=$(round "$CYCLE_START_BALANCE * $DAILY_POINTS / $INITIAL_BALANCE")
 
   # Expected remaining balance based on uniform usage
-  ESTIMATED=$(round "$INITIAL_BALANCE - ($DAYS_ELAPSED * $DAILY_POINTS)")
+  ESTIMATED=$(round "$CYCLE_START_BALANCE - ($DAYS_ELAPSED * $EXPECTED_DAILY_BURN)")
   if [ "$ESTIMATED" -lt 0 ]; then
     ESTIMATED=0
   fi
@@ -232,7 +297,11 @@ if [ "$HAVE_CYCLE" = "true" ]; then
   DAYS_R=$(round "$DAYS_REMAINING")
   TOTAL_DAYS=$((DAYS_E + DAYS_R))
   echo "Day ${DAYS_E} of ${TOTAL_DAYS} (${DAYS_R} days until renewal)"
+  echo "Cycle start balance: $(format_number "$CYCLE_START_BALANCE")"
+  if [ -n "$BASELINE_NOTE" ]; then
+    echo "$BASELINE_NOTE"
+  fi
   echo "Expected balance now: $(format_number "$ESTIMATED") (${est_pct}%)"
-  echo "Daily burn: $(format_number "$ACTUAL_DAILY_BURN") (expected: $(format_number "$DAILY_POINTS"))"
+  echo "Daily burn: $(format_number "$ACTUAL_DAILY_BURN") (expected: $(format_number "$EXPECTED_DAILY_BURN"))"
   echo "Projected end balance: $(format_number "$PROJECTED")"
 fi

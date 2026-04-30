@@ -20,7 +20,7 @@ This includes a [SwiftBar](https://github.com/swiftbar/SwiftBar) (also xbar) plu
 ![Percentage remaining](images/percent.png)
 `Poe: 67%` ← percentage remaining
 
-`Poe: 670k (Est.: 720k)` ← (a) actual points remaining and (b) expected points today assuming the user consumes the same amount of points everyday throughout the month. Example: if your point balance starts at 1E6 units and 1 day has passed, you are expected 967k points remaining for typical usage. "Est." can be useful to judge if you are overspending your points.
+`Poe: 670k (Est.: 720k)` ← (a) actual points remaining and (b) expected points today assuming the user consumes the same amount of points everyday throughout the month. When a billing cycle is configured, the estimate is based on the balance first observed for that cycle, so users who start the month above `1M` keep accurate estimates. "Est." can be useful to judge if you are overspending your points.
 
 ![More details](images/percent_est.png)  
 `Poe: 67% (Est.: 72%)` ← same as above in percentage
@@ -29,9 +29,10 @@ When a billing cycle is configured, the dropdown menu shows additional details:
 
 ```
 Day 12 of 30 (18 days until renewal)
-Expected balance now: 605k (60%)
-Daily burn: 27.3k (expected: 32.9k)
-Projected end balance: 117k
+Cycle start balance: 1.5M
+Expected balance now: 908k (91%)
+Daily burn: 27.5k (expected: 49.3k)
+Projected end balance: 675k
 ```
 
 ### Installing and configuring the SwiftBar plugin
@@ -52,9 +53,17 @@ Projected end balance: 117k
 *To display the estimated points remaining today assuming average use*, change this line:
 
 ```shell
-#<xbar.var>number(VAR_STARTING_DATE="21"): Billing period starting date (1-31). Set to 0 to disable.</xbar.var>
+#<xbar.var>number(VAR_STARTING_DATE="21"): Billing period starting date (1-31). Set to 0 to disable cycle tracking.</xbar.var>
 ```
 For example, the line above defines the starting of the billing period in the 21st of each month.
+
+When billing-cycle tracking is enabled, the plugin stores the first balance it sees for each cycle in `~/Library/Application Support/poe-balance/cycle_state` and uses that value for:
+
+- expected balance now
+- daily burn
+- projected end balance
+
+If SwiftBar was not running when the cycle renewed, the plugin falls back to the first balance it observes later in that same cycle and notes that in the dropdown.
 
 *To keep the menu bar minimal* (show only the current balance, with billing cycle details in the dropdown only):
 
