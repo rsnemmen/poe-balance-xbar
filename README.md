@@ -82,3 +82,11 @@ Points are displayed in human-readable format:
 | 1,000 - 999,999 | `150k` |
 | 1,000,000 - 999,999,999 | `1.5M` |
 | 1B+ | `1.2B` |
+
+## More SwiftBar plugins by the author
+
+Small, glanceable menu bar utilities that stay out of the way until you need them:
+
+- **[claude_code](../claude_code/)** — Claude Code usage limits (5h, 7d windows) at a glance.
+- **[copilot-usage-tracker](../copilot-usage-tracker/)** — GitHub Copilot premium request usage and monthly pacing.
+- **[weather](../weather/)** — Current conditions, temperature, humidity, and wind — no API key required.
