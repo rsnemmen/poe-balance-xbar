@@ -22,6 +22,8 @@ Key constants:
 - `INITIAL_BALANCE = 1,000,000` (monthly Poe point allocation)
 - `DAILY_POINTS = 32,895` (1M / 30.4 days)
 
+State persistence: cycle start balance is written to `~/Library/Application Support/poe-balance/cycle_state` (fields: `cycle_start` epoch seconds, `start_balance`). On each run the script compares the current cycle's start epoch to the saved value; if they match it reuses the saved balance, otherwise it resets and saves the current balance as the new baseline. This handles users who start mid-cycle with a balance above 1M.
+
 SwiftBar plugin metadata (`#<xbar.var>` comments) controls user-configurable variables: `VAR_STARTING_DATE`, `VAR_PERCENT`, `VAR_COMPACT`, `VAR_COLORS`, `VAR_MINIMAL_MENUBAR`.
 
 ## SwiftBar Output Protocol
