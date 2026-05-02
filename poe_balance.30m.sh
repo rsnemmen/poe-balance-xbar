@@ -256,7 +256,7 @@ if is_positive_integer "$STARTING_DATE"; then
   fi
 
   consumed=$((CYCLE_START_BALANCE - balance))
-  EXPECTED_DAILY_BURN=$(round "$CYCLE_START_BALANCE * $DAILY_POINTS / $INITIAL_BALANCE")
+  EXPECTED_DAILY_BURN=$DAILY_POINTS
 
   # Expected remaining balance based on uniform usage
   ESTIMATED=$(round "$CYCLE_START_BALANCE - ($DAYS_ELAPSED * $EXPECTED_DAILY_BURN)")
